@@ -1,0 +1,51 @@
+
+/* For Webkit Browsers (Chrome, Safari) */
+.scrollbar-line::-webkit-scrollbar {
+    width: 1px; /* Thin line width */
+    height: 1px; /* Thin line width for horizontal scrollbar */
+}
+
+.scrollbar-line::-webkit-scrollbar-track {
+    background: transparent; /* Track background */
+}
+
+.scrollbar-line::-webkit-scrollbar-thumb {
+    background: #888; /* Thumb color */
+    border-radius: 0; /* Optional: no rounded corners */
+}
+
+.scrollbar-line::-webkit-scrollbar-thumb:hover {
+    /*background: #555; !* Thumb color on hover *!*/
+    background: #888;  /* Thumb color on hover */
+}
+
+/* For Firefox */
+.scrollbar-line {
+    scrollbar-width: thin; /* Thin scrollbar */
+    /*scrollbar-color: #888 transparent; !* Thumb color and track color *!*/
+    scrollbar-color: rgba(48, 48, 48, 0.32) transparent; /* Thumb color and track color */
+}
+
+
+
+/* For Webkit Browsers (Chrome, Safari) */
+.scrollbar-hide::-webkit-scrollbar {
+    width: 0px; /* Hide scrollbar by setting width to 0px */
+    height: 0px; /* Hide horizontal scrollbar by setting height to 0px */
+}
+
+.scrollbar-hide::-webkit-scrollbar-track {
+    background: transparent; /* Track background */
+}
+
+.scrollbar-hide::-webkit-scrollbar-thumb {
+    background: transparent; /* Thumb color to match hidden scrollbar */
+}
+
+/* For Firefox */
+.scrollbar-hide {
+    scrollbar-width: none; /* Hide scrollbar */
+    scrollbar-color: transparent transparent; /* Transparent thumb and track */
+}
+
+

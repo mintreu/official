@@ -1,0 +1,17 @@
+
+
+.slider-section {
+    @apply w-full relative px-4 grid gap-4;
+}
+
+.slider-section-card {
+    @apply col-span-1 h-96 flex items-center justify-center bg-cover bg-center p-4 relative shadow-md shadow-gray-600;
+}
+
+.slider-section-prev-cta {
+    @apply absolute top-1/2   left-4  rounded-2xl;
+}
+
+.slider-section-next-cta {
+    @apply absolute top-1/2  right-4  rounded-2xl;
+}

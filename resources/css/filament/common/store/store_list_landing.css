@@ -1,0 +1,79 @@
+
+.store-page {
+ @apply w-full h-full md:flex-col gap-2;
+}
+
+.store-list-main {
+    @apply flex gap-3;
+}
+
+.store-topNav {
+    @apply flex justify-center items-center mb-4 gap-2 h-8;
+}
+
+.store-search {
+    @apply w-full  rounded-lg text-gray-800 dark:bg-transparent dark:text-white text-sm;
+}
+
+.store-search-btn {
+    @apply ring-1 ring-purple-800 hover:bg-purple-700 h-10 px-3 py-1 rounded-lg;
+}
+
+.store-sort-section {
+    @apply flex gap-2 min-w-10;
+}
+
+.store-sort {
+    @apply w-full px-2 rounded-lg text-gray-800 dark:bg-transparent dark:text-white text-sm ring-1 ring-purple-800;
+}
+
+.store-sort-option {
+    @apply text-sm text-gray-700 dark:text-white dark:bg-gray-900 ;
+}
+
+
+/*Store Sidebar Styles*/
+
+.store-sidebar-desktop {
+    @apply hidden lg:block;
+}
+
+
+/*Store Category Filter */
+
+.store-filter-category-section {
+    @apply mb-4 text-sm   py-4 px-2 overflow-hidden;
+}
+.store-filter-category-section-title {
+    @apply block  font-medium text-lg mb-2;
+}
+
+.store-filter-list {
+    @apply flex flex-col mt-2 gap-2 overflow-y-scroll w-full max-h-40;
+}
+
+.store-filter-section {
+    @apply mb-6;
+}
+.store-filter-section-title {
+    @apply text-lg font-semibold mb-2;
+}
+
+.store-filter-card {
+    @apply my-1 ;
+}
+
+
+ /*Store Price List Filter*/
+
+.store-filter-input {
+    @apply text-sm block w-1/2 py-1 px-2 bg-gray-100 border border-gray-300 text-gray-600 font-semibold rounded-md placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+
+
+
+
+.store-filter-apply-btn {
+    @apply block w-full py-2 px-4 my-4 rounded-2xl font-bold border-2 border-primary-600 dark:text-white hover:bg-primary-600 hover:shadow-md;
+}
