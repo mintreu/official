@@ -7,6 +7,7 @@
         </p>
     </div>
 
+    @if($plans->count())
     @foreach($plans as $plan)
         @if($plan->is_recommended)
             <!-- Recommended Plan -->
@@ -84,8 +85,6 @@
 
 
 
-
-
     <!-- Comparison Table -->
     <div class="pt-12 py-3 bg-black/50">
         <h2 class="text-3xl font-bold mb-4">Compare Plans</h2>
@@ -141,7 +140,7 @@
     </div>
 
 
-
+    @endif
 
 
 

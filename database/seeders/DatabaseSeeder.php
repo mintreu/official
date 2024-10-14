@@ -22,8 +22,8 @@ class DatabaseSeeder extends Seeder
             ProjectSeeder::class,
             AdminSeeder::class,
             UserSeeder::class,
-            PlanSeeder::class,
-            OrderSeeder::class,
+           // PlanSeeder::class,
+           // OrderSeeder::class,
         ]);
 
     }

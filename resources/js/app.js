@@ -11,6 +11,7 @@ window.OrbitControls = OrbitControls;
 
 
 
-window.Alpine = Alpine
 
-Alpine.start()
+
+ Alpine.start()
+ window.AlpineJs = Alpine
