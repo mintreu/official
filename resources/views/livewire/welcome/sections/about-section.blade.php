@@ -2,7 +2,7 @@
     <h1 class="text-4xl font-bold mb-6">About Us</h1>
 
 
-    <livewire:welcome.animation.three-d  />
+{{--    <livewire:welcome.animation.three-d  />--}}
 
     <div class="flex flex-col md:flex-row gap-6 mb-6">
         <div class="flex-1 justify-center items-center">
