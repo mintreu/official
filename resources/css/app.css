@@ -9,7 +9,7 @@
 
 
 .homepage-section {
-    @apply absolute w-fit mx-3 lg:mx-24 text-center  overflow-auto scrollbar-line flex flex-col pt-16 pb-8  h-full;
+    @apply absolute top-0 left-0 w-full mx-3 lg:mx-24 text-center  overflow-auto scrollbar-line flex flex-col pt-16 pb-8  h-full;
 }
 
 .homepage-section-content {
