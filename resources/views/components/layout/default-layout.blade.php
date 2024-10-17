@@ -10,7 +10,7 @@
     @stack('style')
     @livewireStyles
 </head>
-<body class="antialiased">
+<body class="antialiased scrollbar-hide">
 {{ $slot }}
 @livewireScripts
 @vite('resources/js/app.js')

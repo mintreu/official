@@ -58,7 +58,8 @@
             function checkVisibility() {
                 const isVisible = container.offsetParent !== null; // Check if the container is visible
                 if (!isVisible) {
-                    alert('The background is not visible. Please check your navigation or refresh the page.');
+                  //  alert('The background is not visible. Please check your navigation or refresh the page.');
+                    location.reload();
                 }
             }
 

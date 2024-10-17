@@ -1,6 +1,6 @@
 @section('title', $title ?? config('app.name'))
 
-<div class="relative h-screen w-full overflow-hidden" x-data="{ isOpen: false }">
+<div class="relative h-screen w-full overflow-hidden bg-black" x-data="{ isOpen: false }">
 
     {{-- Full-Screen Background --}}
     <livewire:animation.paralax-background />
@@ -41,20 +41,34 @@
                     ['#projects', 'Projects', 'heroicon-s-light-bulb'],
                     ['#products', 'Products', 'heroicon-s-cube'],
                     ['#pricing', 'Pricing', 'heroicon-s-tag'],
-                    ['#contact', 'Contact', 'heroicon-s-phone'],
-                    [url('/app'), 'Login', 'heroicon-s-lock-closed']
+                    ['#contact', 'Contact', 'heroicon-s-phone']
                 ] as [$href, $label, $icon])
                     <a href="{{ $href }}" @click.prevent="activeSection = '{{ strtolower($label) }}'" class="flex items-center gap-2 p-2 rounded hover:bg-gray-700" :class="isOpen ? 'justify-start' : 'justify-center'">
-                        @svg($icon, 'w-6 h-6 text-white') {{-- Ensure icon color is white --}}
+                        @svg($icon, 'w-6 h-6 text-white')
                         <span x-show="isOpen" x-transition class="text-white">{{ $label }}</span>
                     </a>
                 @endforeach
+
+                {{-- Conditional Auth Link --}}
+                @if(auth()->check())
+                    {{-- Show Dashboard link for authenticated users --}}
+                    <a href="{{ url('/dashboard') }}" class="flex items-center gap-2 p-2 rounded hover:bg-gray-700" :class="isOpen ? 'justify-start' : 'justify-center'">
+                        @svg('heroicon-s-user-circle', 'w-6 h-6 text-white')
+                        <span x-show="isOpen" x-transition class="text-white">Dashboard</span>
+                    </a>
+                @else
+                    {{-- Show Login link for guests --}}
+                    <a href="{{ url('/app') }}" class="flex items-center gap-2 p-2 rounded hover:bg-gray-700" :class="isOpen ? 'justify-start' : 'justify-center'">
+                        @svg('heroicon-s-lock-closed', 'w-6 h-6 text-white')
+                        <span x-show="isOpen" x-transition class="text-white">Login</span>
+                    </a>
+                @endif
             </div>
         </div>
         {{-- ./Sidebar Navigation --}}
 
         {{-- Main Content --}}
-        <div class="grow bg-gray-800 bg-opacity-70 p-8 rounded-lg">
+        <div class="grow text-white bg-opacity-70 p-8 rounded-lg overflow-y-scroll overflow-hidden scrollbar-line">
             {{ $slot }}
         </div>
         {{-- ./Main Content --}}
