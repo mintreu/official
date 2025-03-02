@@ -6,7 +6,6 @@ namespace App\Models;
 use App\Models\Order\Order;
 use App\Models\Product\Product;
 use App\Models\Product\UserProduct;
-use App\Models\Studio\Studio;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -105,10 +104,7 @@ class User extends Authenticatable  implements HasMedia,FilamentUser
 
 
 
-    public function studios(): HasMany
-    {
-        return $this->hasMany(Studio::class,'user_id','id');
-    }
+
 
 
 

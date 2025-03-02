@@ -27,7 +27,7 @@ class ProjectSeeder extends Seeder
                 'desc' => implode('<br>',fake()->paragraphs(4)),
             ]);
 
-            $newProject->addMediaFromUrl('https://picsum.photos/400/300')->toMediaCollection('displayImage');
+           // $newProject->addMediaFromUrl('https://picsum.photos/400/300')->toMediaCollection('displayImage');
 
 
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Affiliate;
+namespace App\Models\Office;
 
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Affiliate extends Authenticatable  implements HasMedia,FilamentUser
+class Employee extends Authenticatable  implements HasMedia,FilamentUser
 {
     use HasFactory, Notifiable,InteractsWithMedia;
 
@@ -64,6 +64,4 @@ class Affiliate extends Authenticatable  implements HasMedia,FilamentUser
     {
         return true;
     }
-
-
 }
