@@ -21,13 +21,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             ProjectSeeder::class,
             AdminSeeder::class,
-            UserSeeder::class,
-<<<<<<< Updated upstream
-=======
-           ProductSeeder::class
->>>>>>> Stashed changes
-           // PlanSeeder::class,
-           // OrderSeeder::class,
+            UserSeeder::class
         ]);
 
     }
