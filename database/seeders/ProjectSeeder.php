@@ -19,7 +19,7 @@ class ProjectSeeder extends Seeder
         foreach ($allProjects as $project)
         {
            $newProject = Project::factory()
-               ->hasProducts(rand(6,10))
+               //->hasProducts(rand(6,10))
                ->create([
                 'name' => $name = $project['name'],
                 'url' => Str::slug($name),

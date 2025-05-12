@@ -3,13 +3,15 @@
 namespace App\Models\Product;
 
 use App\Models\Category\Category;
-use App\Models\Enums\ProductTypeCast;
+use App\Models\Enums\Product\ProductTypeCast;
 use App\Models\Project\Project;
 use App\Models\Project\ProjectPlan;
+use App\Models\Service\Service;
 use App\Models\Subscription\Plan;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -21,29 +23,19 @@ class Product extends Model  implements HasMedia
 
 
 
-
     protected $fillable = [
         'type',
         'name',
         'url',
-        'short_desc',
-        'desc',
         'status',
-        'chargeable',
-        'base_price',
-        'tax_percent',
-        'tax_amount',
-        'price',
         'popularity',
         'views',
         'featured',
         'visibility',
-        'api_url',
-        'demo_accounts',
-        'metadata',
+        'service_id',
+        'category_id',
         'project_id',
     ];
-
 
 
     /**
@@ -55,18 +47,10 @@ class Product extends Model  implements HasMedia
     protected $casts = [
         'type' => ProductTypeCast::class,
         'status' => 'boolean',
-        'chargeable' => 'boolean',
-        'base_price' => 'float',
-        'tax_percent' => 'float',
-        'tax_amount' => 'float',
-        'price' => 'float',
         'popularity' => 'integer',
         'views' => 'integer',
         'featured' => 'boolean',
         'visibility' => 'boolean',
-        'demo_accounts' => 'array', // JSON cast as array
-        'metadata' => 'array',      // JSON cast as array
-        'project_id' => 'integer',
     ];
 
 
@@ -79,6 +63,15 @@ class Product extends Model  implements HasMedia
     }
 
 
+    public function flat(): HasOne
+    {
+        return $this->hasOne(ProductFlat::class,'product_id','id');
+    }
+
+    public function plans(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ProductPlan::class,'product_id','id');
+    }
 
 
     public function project(): BelongsTo
@@ -92,39 +85,11 @@ class Product extends Model  implements HasMedia
         return $this->belongsTo(Category::class,'category_id','id');
     }
 
-
-    public function plans()
+    public function services(): BelongsTo
     {
-        return $this->hasMany(Plan::class,'product_id','id');
+        return $this->belongsTo(Service::class,'service_id','id');
     }
 
-
-
-
-    // Accessor to get the full price (price + tax_amount)
-    public function getFullPriceAttribute()
-    {
-        return $this->price + $this->tax_amount;
-    }
-
-    // Example method to calculate discount
-    public function applyDiscount(float $discount)
-    {
-        $discountedPrice = $this->price * ((100 - $discount) / 100);
-        return round($discountedPrice, 2);
-    }
-
-    // Scope to filter by visibility
-    public function scopeVisible($query)
-    {
-        return $query->where('visibility', true);
-    }
-
-    // Scope to filter featured products
-    public function scopeFeatured($query)
-    {
-        return $query->where('featured', true);
-    }
 
 
 

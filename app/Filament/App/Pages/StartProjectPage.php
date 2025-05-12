@@ -2,14 +2,12 @@
 
 namespace App\Filament\App\Pages;
 
-use App\Filament\Common\Pages\Abstract\ExtendedPage;
 use App\Filament\Common\Pages\XPage\XPage;
-use App\Models\Enums\ProductTypeCast;
+use App\Models\Enums\Product\ProductTypeCast;
 use App\Models\Product\Product;
 use App\Models\Subscription\Plan;
 use App\Services\MoneyService\Money;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -19,8 +17,6 @@ use Filament\Forms\Set;
 use Filament\Infolists\Components\Fieldset;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
-use Filament\Pages\Page;
-use Filament\Tables\Columns\TextColumn;
 use Icetalker\FilamentPicker\Forms\Components\Picker;
 use Illuminate\Database\Eloquent\Model;
 

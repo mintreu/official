@@ -2,14 +2,11 @@
 
 namespace App\Filament\Common\Schemas\Product;
 
-use App\Models\Enums\ProductTypeCast;
+use App\Models\Enums\Product\ProductTypeCast;
 use App\Models\Project\Project;
 use App\Services\MoneyService\Money;
 use App\Services\ProductService\ProductImporter;
-use Awcodes\TableRepeater\Components\TableRepeater;
-use Awcodes\TableRepeater\Header;
 use Filament\Forms;
-use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -17,11 +14,7 @@ use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Get;
-use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\HtmlString;
-use Illuminate\Support\Str;
 
 
 trait ProductFormSchema

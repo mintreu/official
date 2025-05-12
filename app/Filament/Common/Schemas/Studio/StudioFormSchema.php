@@ -2,7 +2,7 @@
 
 namespace App\Filament\Common\Schemas\Studio;
 
-use App\Models\Enums\ProductTypeCast;
+use App\Models\Enums\Product\ProductTypeCast;
 use App\Models\Product\Product;
 use App\Models\Project\Project;
 use App\Models\Subscription\Plan;

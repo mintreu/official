@@ -3,25 +3,20 @@
 namespace App\Filament\Common\Schemas\Order;
 
 use App\Livewire\Filament\OrderPreviewTable;
-use App\Models\Enums\ProductTypeCast;
+use App\Models\Enums\Product\ProductTypeCast;
 use App\Models\Product\Product;
 use App\Models\Project\Project;
 use App\Models\Subscription\Plan;
 use App\Services\MoneyService\Money;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Livewire;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Wizard;
 use Filament\Forms\Get;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\IconPosition;
 use Filament\Support\Enums\IconSize;
 use Icetalker\FilamentPicker\Forms\Components\Picker;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\HtmlString;
 use JaOcero\RadioDeck\Forms\Components\RadioDeck;
 
 trait HasOrderCreationFormSchema
