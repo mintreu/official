@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Common\Resources\Studio\StudioResource;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -56,6 +57,9 @@ class AppPanelProvider extends PanelProvider
                     ),
             ])
             ->viteTheme('resources/css/filament/app/theme.css')
+            ->resources([
+                StudioResource::class
+            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

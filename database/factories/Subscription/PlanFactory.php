@@ -2,42 +2,36 @@
 
 namespace Database\Factories\Subscription;
 
+use App\Models\Product\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Subscription\Plan>
- */
 class PlanFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
+        $product = Product::factory()->create();
+
         return [
-            'name' => $this->faker->word,
-            'url' => $this->faker->unique()->url,
+            'name' => $name = $this->faker->randomElement(['Free','Standard','Pro','Enterprise']) .' '.Str::limit($product->name,10),
+            'url' => Str::slug($name),
+            'desc' => $this->faker->optional()->sentence(),
             'base_price' => $this->faker->randomFloat(2, 0, 100),
-            'hsn_code' => $this->faker->optional()->ean8,
+            'hsn_code' => $this->faker->optional()->ean8(),
             'tax_percent' => $this->faker->randomFloat(2, 0, 100),
             'tax_amount' => $this->faker->randomFloat(2, 0, 100),
             'price' => $this->faker->randomFloat(2, 0, 100),
             'per_month_limit' => $this->faker->optional()->numberBetween(100, 1000),
             'auth_type' => $this->faker->optional()->randomElement(['Basic', 'OAuth 2.0', 'API Keys']),
-            'support_type' => $this->faker->optional()->randomElement(['Community', 'Standard', 'Priority', '24/7', 'Dedicated']),
-            'documentation_type' => $this->faker->optional()->randomElement(['Limited', 'Basic', 'Enhanced', 'Comprehensive']),
-            'custom_features' => $this->faker->boolean,
-            'rate_limit' => $this->faker->randomElement(['100', '1,000', '10,000', '50,000', 'Unlimited']),
-            'authentication' => $this->faker->randomElement(['Basic', 'OAuth 2.0', 'API Keys', 'Custom']),
-            'support' => $this->faker->randomElement(['Community', 'Standard', 'Priority', '24/7', 'Dedicated']),
-            'documentation' => $this->faker->randomElement(['Limited', 'Basic', 'Enhanced', 'Comprehensive']),
-            'data_security' => $this->faker->randomElement(['Basic', 'Standard', 'Enhanced', 'Advanced', 'Enterprise']),
-            'analytics_reporting' => $this->faker->randomElement(['Basic', 'Standard', 'Enhanced', 'Advanced', 'Custom']),
-            'plugin_support' => $this->faker->boolean,
-            'upgradable' => $this->faker->boolean,
-            'metadata' => $this->faker->optional()->json,
+            'support_type' => $this->faker->optional()->randomElement(['Community', 'Standard', 'Priority']),
+            'documentation_type' => $this->faker->optional()->randomElement(['Limited', 'Basic', 'Enhanced']),
+            'features' => $this->faker->optional()->randomElements([
+                'analytics', 'priority_support', 'custom_reports', 'white_label', 'multi_user'
+            ], rand(1, 3)),
+            'is_recommended' => $this->faker->boolean(),
+            'is_enterprise' => $this->faker->boolean(),
+            'visible_on_front' => $this->faker->boolean(),
+            'product_id' => $product->id,
         ];
     }
 }

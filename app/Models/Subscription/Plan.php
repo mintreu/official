@@ -2,6 +2,7 @@
 
 namespace App\Models\Subscription;
 
+use App\Models\Product\Product;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,14 +26,19 @@ class Plan extends Model
         'features',
         'is_recommended',
         'is_enterprise',
-        'visible_on_front'
+        'visible_on_front',
+        'product_id',
     ];
 
     protected $casts = [
         'features' => 'array',
-        'is_recommended' => 'bool',
-        'is_enterprise' => 'bool',
-        'visible_on_front' => 'bool',
+        'is_recommended' => 'boolean',
+        'is_enterprise' => 'boolean',
+        'visible_on_front' => 'boolean',
     ];
-}
 
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+}

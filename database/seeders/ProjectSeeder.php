@@ -19,7 +19,7 @@ class ProjectSeeder extends Seeder
         foreach ($allProjects as $project)
         {
            $newProject = Project::factory()
-               ->hasProducts(rand(6,10))
+               //->hasProducts(rand(2,4))
                ->create([
                 'name' => $name = $project['name'],
                 'url' => Str::slug($name),
@@ -27,7 +27,7 @@ class ProjectSeeder extends Seeder
                 'desc' => implode('<br>',fake()->paragraphs(4)),
             ]);
 
-            $newProject->addMediaFromUrl('https://picsum.photos/400/300')->toMediaCollection('displayImage');
+            //$newProject->addMediaFromUrl('https://picsum.photos/400/300')->toMediaCollection('displayImage');
 
 
 

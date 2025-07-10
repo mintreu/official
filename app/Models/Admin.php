@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Studio\Studio;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -60,4 +61,22 @@ class Admin extends Authenticatable  implements HasMedia,FilamentUser
     {
         return true;
     }
+
+    public function canImpersonate()
+    {
+        return true;
+    }
+
+    public function hostedStudios()
+    {
+        return $this->morphMany(Studio::class, 'host');
+    }
+
+
+
+
+
+
+
+
 }

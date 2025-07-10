@@ -5,7 +5,6 @@ namespace App\Models\Product;
 use App\Models\Category\Category;
 use App\Models\Enums\ProductTypeCast;
 use App\Models\Project\Project;
-use App\Models\Project\ProjectPlan;
 use App\Models\Subscription\Plan;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,21 +26,17 @@ class Product extends Model  implements HasMedia
         'name',
         'url',
         'short_desc',
-        'desc',
+
         'status',
         'chargeable',
-        'base_price',
-        'tax_percent',
-        'tax_amount',
-        'price',
         'popularity',
         'views',
         'featured',
         'visibility',
         'api_url',
-        'demo_accounts',
         'metadata',
         'project_id',
+        'parent_id'
     ];
 
 
@@ -56,10 +51,7 @@ class Product extends Model  implements HasMedia
         'type' => ProductTypeCast::class,
         'status' => 'boolean',
         'chargeable' => 'boolean',
-        'base_price' => 'float',
-        'tax_percent' => 'float',
-        'tax_amount' => 'float',
-        'price' => 'float',
+
         'popularity' => 'integer',
         'views' => 'integer',
         'featured' => 'boolean',
@@ -69,6 +61,10 @@ class Product extends Model  implements HasMedia
         'project_id' => 'integer',
     ];
 
+    public function getRouteKeyName(): string
+    {
+        return 'url';
+    }
 
 
 
@@ -76,9 +72,27 @@ class Product extends Model  implements HasMedia
     {
         $this->addMediaCollection('displayImage')
             ->useFallbackUrl('https://placehold.co/800x600/violet/white?text=Product+Image');
+
+        $this->addMediaCollection('imageGallery')
+            ->useFallbackUrl('https://placehold.co/1200x800/brown/white?text=Screenshot');
     }
 
 
+    public function data()
+    {
+        return $this->hasOne(ProductData::class,'product_id','id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(Product::class,'parent_id','id');
+    }
+
+
+    public function parent()
+    {
+        return $this->belongsToMany(Product::class,'parent_id','id');
+    }
 
 
     public function project(): BelongsTo
@@ -101,18 +115,6 @@ class Product extends Model  implements HasMedia
 
 
 
-    // Accessor to get the full price (price + tax_amount)
-    public function getFullPriceAttribute()
-    {
-        return $this->price + $this->tax_amount;
-    }
-
-    // Example method to calculate discount
-    public function applyDiscount(float $discount)
-    {
-        $discountedPrice = $this->price * ((100 - $discount) / 100);
-        return round($discountedPrice, 2);
-    }
 
     // Scope to filter by visibility
     public function scopeVisible($query)

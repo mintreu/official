@@ -1,0 +1,12 @@
+[
+    {
+        "namespace": "Filipfonal\\FilamentLogManager",
+        "provider": "Filipfonal\\FilamentLogManager\\FilamentLogManagerServiceProvider",
+        "class": "Filipfonal\\FilamentLogManager\\FilamentLogManager",
+        "path": "app\\Plugins\\filipfonal\/filament-log-manager\\src",
+        "files": {
+            "provider": "C:\\laragon\\www\\mintreu\\server\\official\\app\\Plugins\\filipfonal\/filament-log-manager\\src\/FilamentLogManagerServiceProvider.php",
+            "class": "C:\\laragon\\www\\mintreu\\server\\official\\app\\Plugins\\filipfonal\/filament-log-manager\\src\/FilamentLogManager.php"
+        }
+    }
+]

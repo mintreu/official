@@ -18,15 +18,13 @@ return new class extends Migration
             $table->string('url')->unique();
 
             $table->text('short_desc')->nullable();
-            $table->text('desc')->nullable();
 
-            $table->boolean('status')->default(false);
+
+            $table->string('status')->nullable();
+            $table->text('status_feedback')->nullable();
 
             $table->boolean('chargeable')->default(false);
 
-            // Purchase Charges No Api Subscription
-            $table->float('price', 10, 2, true)->default(0.00);
-            $table->string('tax_type')->default('none');
 
 
             $table->integer('popularity')->default(0);
@@ -36,16 +34,12 @@ return new class extends Migration
 
 
 
-            $table->string('host_url')->nullable();
-            $table->string('host_api_url')->nullable();
-            $table->string('client_login_url')->nullable();
-
-            $table->json('demo_accounts')->nullable();
-            $table->json('product_info')->nullable();
-            $table->json('metadata')->nullable();
+            $table->foreignId('parent_id')->nullable()->constrained('products')->cascadeOnUpdate()->nullOnDelete();
 
             $table->foreignId('project_id')->nullable()->constrained('projects')->cascadeOnUpdate()->nullOnDelete();
             $table->foreignId('category_id')->nullable()->constrained('categories')->cascadeOnUpdate()->nullOnDelete();
+
+
 
             $table->timestamps();
         });

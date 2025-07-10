@@ -8,7 +8,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "akaunting/laravel-money": "^5.2",
         "awcodes/filament-table-repeater": "^3.0",
         "filament/filament": "^3.2",
@@ -18,9 +18,12 @@
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.5",
-        "swisnl/filament-backgrounds": "^1.1"
+        "stechstudio/filament-impersonate": "^3.16",
+        "swisnl/filament-backgrounds": "^1.1",
+        "ext-zip": "*"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.15",
         "fakerphp/faker": "^1.23",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",
@@ -31,6 +34,7 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/",
+            "Plugins\\": "app/Plugins/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         }

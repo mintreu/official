@@ -5,9 +5,10 @@ namespace App\Models\Studio;
 use App\Models\Product\Product;
 use App\Models\Subscription\Plan;
 use App\Models\Subscription\Subscription;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
@@ -15,45 +16,40 @@ class Studio extends Model
 {
     use HasFactory;
 
-
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'name',
         'url',
-        'domain_schema',
         'domain',
+        'key',
+        'secret',
+        'serial',
         'expire_on',
-        'serial_key',
-        'user_id',
+        'is_active',
+        'is_trial',
+        'trial_ends_at',
+        'channel',
+        'version',
+        'platform',
+        'host_id',
+        'host_type',
         'product_id',
         'plan_id',
         'subscription_id',
+        'metadata',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
     protected $casts = [
         'expire_on' => 'datetime',
+        'trial_ends_at' => 'datetime',
+        'is_active' => 'boolean',
+        'is_trial' => 'boolean',
+        'metadata' => 'array',
     ];
 
-    /**
-     * The "booted" method of the model.
-     * Automatically generate a unique ULID when a new Vendor is created.
-     */
-    protected static function booted()
+    protected static function booted(): void
     {
-        // Ensure the parent booted method is called first
         parent::booted();
 
-        // Assign ULID to the uuid column when creating a vendor
         static::creating(function ($studio) {
             if (empty($studio->url)) {
                 $studio->url = Str::ulid();
@@ -61,73 +57,53 @@ class Studio extends Model
         });
     }
 
-    /**
-     * Get the user associated with the studio.
-     */
-    public function user()
+    public function host(): MorphTo
     {
-        return $this->belongsTo(User::class);
+        return $this->morphTo();
     }
 
-    /**
-     * Get the product associated with the studio.
-     */
-    public function product()
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
-    /**
-     * Get the plan associated with the studio.
-     */
-    public function plan()
+    public function plan(): BelongsTo
     {
         return $this->belongsTo(Plan::class);
     }
 
-    /**
-     * Get the subscription associated with the studio.
-     */
-    public function subscription()
+    public function subscription(): BelongsTo
     {
         return $this->belongsTo(Subscription::class);
     }
 
-    /**
-     * Check if the subscription has expired.
-     *
-     * @return bool
-     */
     public function hasExpired(): bool
     {
         return $this->expire_on ? Carbon::now()->greaterThan($this->expire_on) : false;
     }
 
-    /**
-     * Deactivate the studio if the subscription has expired.
-     */
     public function deactivateIfExpired(): void
     {
         if ($this->hasExpired()) {
             $this->update([
-                'serial_key' => null, // You may want to reset serial key or handle differently
+                'is_active' => false,
+                'serial' => null,
             ]);
         }
     }
 
-    /**
-     * Get the full domain URL for the studio.
-     *
-     * @return string
-     */
     public function getFullDomainAttribute(): string
     {
         return $this->domain_schema . $this->domain;
     }
 
+    public function isInTrial(): bool
+    {
+        return $this->is_trial && Carbon::now()->lessThanOrEqualTo($this->trial_ends_at);
+    }
 
-
-
-
-
+    public function isValid(): bool
+    {
+        return $this->is_active && !$this->hasExpired();
+    }
 }

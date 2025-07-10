@@ -68,7 +68,11 @@ class User extends Authenticatable  implements HasMedia,FilamentUser
         return true;
     }
 
-
+    public function canBeImpersonated()
+    {
+        // Let's prevent impersonating other users at our own company
+        return true;
+    }
 
     public function orders(): HasMany
     {
@@ -105,9 +109,9 @@ class User extends Authenticatable  implements HasMedia,FilamentUser
 
 
 
-    public function studios(): HasMany
+    public function hostedStudios()
     {
-        return $this->hasMany(Studio::class,'user_id','id');
+        return $this->morphMany(Studio::class, 'host');
     }
 
 

@@ -12,7 +12,6 @@ class Subscription extends Model
 {
     use HasFactory;
 
-
     protected $fillable = [
         'user_id',
         'plan_id',
@@ -28,15 +27,12 @@ class Subscription extends Model
         'is_active' => 'boolean',
     ];
 
-
-
-
     /**
      * Get the user associated with the subscription.
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class,'user_id','id');
+        return $this->belongsTo(User::class);
     }
 
     /**
@@ -44,7 +40,7 @@ class Subscription extends Model
      */
     public function plan(): BelongsTo
     {
-        return $this->belongsTo(Plan::class,'plan_id','id');
+        return $this->belongsTo(Plan::class);
     }
 
     /**
@@ -53,7 +49,7 @@ class Subscription extends Model
     public function calculateExpiryDate(): void
     {
         if ($this->start_date) {
-            $this->expiry_date = Carbon::parse($this->start_date)->addMonths($this->duration_in_months);
+            $this->expiry_date = $this->start_date->copy()->addMonths($this->duration_in_months);
         }
     }
 
@@ -68,7 +64,7 @@ class Subscription extends Model
     /**
      * Start a subscription and calculate the expiry date.
      */
-    public function startSubscription()
+    public function startSubscription(): void
     {
         $this->start_date = now();
         $this->calculateExpiryDate();
@@ -80,7 +76,7 @@ class Subscription extends Model
      */
     public function isExpired(): bool
     {
-        return Carbon::now()->greaterThan($this->expiry_date);
+        return $this->expiry_date && now()->greaterThan($this->expiry_date);
     }
 
     /**
@@ -89,13 +85,7 @@ class Subscription extends Model
     public function deactivateIfExpired(): void
     {
         if ($this->isExpired()) {
-            $this->is_active = false;
-            $this->save();
+            $this->update(['is_active' => false]);
         }
     }
-
-
-
-
-
 }

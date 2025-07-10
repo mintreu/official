@@ -2,6 +2,11 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Common\Resources\Studio\StudioResource;
+use App\Models\Enums\PluginStatusCast;
+use App\Services\PluginService\Plugin;
+use App\Services\PluginService\PluginHandler;
+use App\Services\PluginService\PluginManager;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -44,9 +49,14 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 Widgets\AccountWidget::class,
             ])
-            ->plugins([
+            ->plugins(array_merge([
                 FilamentBackgroundsPlugin::make()
                     ->showAttribution(false),
+            ],
+                //$this->getActivePluginInstances()
+            ))
+            ->resources([
+                StudioResource::class
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -63,4 +73,31 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ]);
     }
+
+
+    protected function getActivePluginInstances(): array
+    {
+        // Resolve plugins and cache the config for this request
+        $manager = PluginManager::make();
+
+        $json = $manager->getRegistryData();
+        $plugins = json_decode($json, true) ?? [];
+        $bag = [];
+        if ($plugins)
+        {
+
+            foreach ($plugins as $plugin) {
+                $class = $plugin['class'];
+                if (class_exists($class)) {
+                    $bag[] = $class::make();
+                }
+            }
+        }
+
+
+        return $bag;
+    }
+
+
+
 }

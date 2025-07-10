@@ -8,10 +8,13 @@ use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\IconSize;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
 class UserResource extends Resource
 {
@@ -62,6 +65,14 @@ class UserResource extends Resource
                 //
             ])
             ->actions([
+                Impersonate::make()
+                    ->model(fn(Model $record) => $record)
+                    ->iconSize(IconSize::Small)
+                    ->requiresConfirmation()
+                    ->guard(filament()->getPanel('app')->getAuthGuard())
+                    ->visible(fn() => filament()->getCurrentPanel()->getId() == 'admin')
+                    ->failureRedirectUrl(fn() => self::$resource::getUrl())
+                    ->redirectTo(filament()->getPanel('app')->getUrl()),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])

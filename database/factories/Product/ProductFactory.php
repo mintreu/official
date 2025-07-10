@@ -12,30 +12,24 @@ use Illuminate\Support\Str;
  */
 class ProductFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
-        $categories = Category::all();
+        $name = $this->faker->unique()->word . ' ' . $this->faker->unique()->word;
 
         return [
-            'type' => fake()->randomElement(ProductTypeCast::class),
-            'name' => $name = fake()->unique()->word.' '.fake()->unique()->word,
+            'type' => $type = $this->faker->randomElement(ProductTypeCast::cases())->value,
+            'name' => $name,
             'url' => Str::slug($name),
-            'short_desc' => $this->faker->paragraph(6),
-            'desc' => $this->faker->paragraph(20),
+            'short_desc' => $this->faker->text(220),
+
             'status' => $this->faker->boolean,
             'chargeable' => $this->faker->boolean,
-//            'base_price' => $this->faker->randomFloat(2, 0, 1000),
-//            'tax_percent' => $this->faker->randomFloat(2, 0, 100),
-//            'tax_amount' => $this->faker->randomFloat(2, 0, 100),
-            'price' => $this->faker->randomFloat(2, 0, 1000),
-            'metadata' => json_encode(['key' => $this->faker->word]),
-            'category_id' => $categories->random(1)->first->id,
+
         ];
     }
-}
 
+
+
+
+
+}

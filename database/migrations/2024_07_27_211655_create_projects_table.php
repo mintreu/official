@@ -20,6 +20,7 @@ return new class extends Migration
             $table->boolean('status')->default(false);
             $table->integer('order')->default(0);
             $table->foreignId('parent_id')->nullable()->constrained('projects')->cascadeOnUpdate()->nullOnDelete();
+            $table->foreignId('category_id')->nullable()->constrained('categories')->cascadeOnUpdate()->nullOnDelete();
             $table->timestamps();
         });
     }
