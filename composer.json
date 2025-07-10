@@ -9,8 +9,10 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "ext-zip": "*",
         "akaunting/laravel-money": "^5.2",
         "awcodes/filament-table-repeater": "^3.0",
+        "dutchcodingcompany/filament-socialite": "^2.4",
         "filament/filament": "^3.2",
         "filament/spatie-laravel-media-library-plugin": "^3.2",
         "icetalker/filament-picker": "^0.1.1",
@@ -19,8 +21,7 @@
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.5",
         "stechstudio/filament-impersonate": "^3.16",
-        "swisnl/filament-backgrounds": "^1.1",
-        "ext-zip": "*"
+        "swisnl/filament-backgrounds": "^1.1"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15",

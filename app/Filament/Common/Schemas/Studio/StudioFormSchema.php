@@ -2,6 +2,7 @@
 
 namespace App\Filament\Common\Schemas\Studio;
 
+use App\Forms\Components\SelectPro;
 use App\Models\Enums\ProductTypeCast;
 use App\Models\Product\Product;
 use App\Models\Project\Project;
@@ -86,12 +87,23 @@ trait StudioFormSchema
                             ->label('Choose Product')
                             ->inlineLabel()
                             ->placeholder('Select a product')
-                            ->relationship('product','name')
-                            ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->name} [{$record->type->getLabel()}]")
+                            ->relationship('product', 'name',fn($query) => $query->with('media'))
+                            ->getOptionLabelFromRecordUsing(function (Product $record) {
+                                $imageUrl = $record->getFirstMediaUrl('displayImage') ?? '/default-image.jpg';
+                                return <<<HTML
+                                    <div class="flex items-center space-x-2 gap-2">
+                                        <img src="{$imageUrl}" alt="{$record->name}" class="w-20 h-20 rounded object-cover" />
+                                        <span>{$record->name} [{$record->type->getLabel()}]</span>
+                                    </div>
+                                HTML;
+                            })
+                            ->searchable()
+                            ->preload()
+                            ->allowHtml() // Important!
                             ->live()
                             ->required()
-                            ->default(fn($state) => $state)
-                            ->disabled(fn() => !is_null($this->product)),
+                            ->default(fn ($state) => $state)
+                            ->disabled(fn () => !is_null($this->product)),
 
 
                     ]),
