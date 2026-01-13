@@ -11,7 +11,7 @@ export default defineNuxtConfig({
 
   // ✅ Laravel Sanctum Configuration
   laravelSanctum: {
-    apiUrl: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8000',
+    apiUrl: process.env.NUXT_PUBLIC_API_BASE || 'https://account.mintreu.com',
     authMode: 'token',
     userResponseWrapperKey: 'data',
     token: {
@@ -38,7 +38,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8000'
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://account.mintreu.com'
     }
   },
 
