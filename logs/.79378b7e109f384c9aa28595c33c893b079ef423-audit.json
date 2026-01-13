@@ -1,0 +1,25 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\laragon\\www\\mintreu\\server\\official\\logs\\.79378b7e109f384c9aa28595c33c893b079ef423-audit.json",
+    "files": [
+        {
+            "date": 1768086490290,
+            "name": "C:\\laragon\\www\\mintreu\\server\\official\\logs\\mcp-puppeteer-2026-01-11.log",
+            "hash": "1c0f1859df08bce4ff0db44f2c2c456c87cb0fce06061d7c9b183bf07bb27b46"
+        },
+        {
+            "date": 1768206111269,
+            "name": "C:\\laragon\\www\\mintreu\\server\\official\\logs\\mcp-puppeteer-2026-01-12.log",
+            "hash": "fb79ae2567e072397630a66fc37a49f1ea587e21380be675a38f3c20ad8e70f2"
+        },
+        {
+            "date": 1768263590232,
+            "name": "C:\\laragon\\www\\mintreu\\server\\official\\logs\\mcp-puppeteer-2026-01-13.log",
+            "hash": "89d33a7f3243f33ce4490f44322407d6c7141b48a349fda92fc4ef8bb1e4fdd6"
+        }
+    ],
+    "hashType": "sha256"
+}

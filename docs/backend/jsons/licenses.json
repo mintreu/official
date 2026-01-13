@@ -1,0 +1,20 @@
+[
+  {
+    "user_id": 1,
+    "marketplace_product_id": 1,
+    "license_key": "LIC-AAAA-BBBB-CCCC-DDDD",
+    "expires_at": "2026-11-21 23:59:59"
+  },
+  {
+    "user_id": 1,
+    "marketplace_product_id": 2,
+    "license_key": "LIC-EEEE-FFFF-GGGG-HHHH",
+    "expires_at": null
+  },
+  {
+    "user_id": 2,
+    "marketplace_product_id": 1,
+    "license_key": "LIC-IIII-JJJJ-KKKK-LLLL",
+    "expires_at": "2025-12-31 23:59:59"
+  }
+]

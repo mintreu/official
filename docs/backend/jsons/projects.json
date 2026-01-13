@@ -1,0 +1,62 @@
+[
+  {
+    "id": "01",
+    "title": "E-Commerce Platform",
+    "description": "Full-featured online store with Laravel backend, Nuxt frontend, and native Android app.",
+    "icon": "lucide:shopping-cart",
+    "platform": "Web + Mobile",
+    "tech": ["Laravel", "Nuxt", "Kotlin", "Stripe"],
+    "duration": "4 months",
+    "result": "300% ROI"
+  },
+  {
+    "id": "02",
+    "title": "Healthcare Portal",
+    "description": "HIPAA-compliant patient management system with telemedicine capabilities.",
+    "icon": "lucide:heart-pulse",
+    "platform": "Web + Desktop",
+    "tech": ["Laravel", "Livewire", "Electron"],
+    "duration": "5 months",
+    "result": "10K+ Users"
+  },
+  {
+    "id": "03",
+    "title": "FinTech Dashboard",
+    "description": "Real-time financial analytics dashboard with AI-powered insights.",
+    "icon": "lucide:bar-chart-3",
+    "platform": "Web",
+    "tech": ["Next.js", "Python", "TensorFlow"],
+    "duration": "3 months",
+    "result": "$1M+ Processed"
+  },
+  {
+    "id": "04",
+    "title": "Delivery App",
+    "description": "On-demand delivery platform with real-time tracking and routing.",
+    "icon": "lucide:truck",
+    "platform": "Mobile + Web",
+    "tech": ["Kotlin", "Laravel", "Google Maps"],
+    "duration": "6 months",
+    "result": "50K+ Orders"
+  },
+  {
+    "id": "05",
+    "title": "CRM System",
+    "description": "Enterprise CRM with FilamentPHP admin panel and automation.",
+    "icon": "lucide:users",
+    "platform": "Web",
+    "tech": ["Laravel", "FilamentPHP", "Livewire"],
+    "duration": "4 months",
+    "result": "95% Efficiency"
+  },
+  {
+    "id": "06",
+    "title": "Learning Platform",
+    "description": "Interactive e-learning platform with video streaming and assessments.",
+    "icon": "lucide:graduation-cap",
+    "platform": "Web + Mobile",
+    "tech": ["Nuxt", "Laravel", "Android"],
+    "duration": "7 months",
+    "result": "20K+ Students"
+  }
+]

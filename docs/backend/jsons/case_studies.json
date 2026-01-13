@@ -1,0 +1,41 @@
+[
+  {
+    "id": "01",
+    "title": "E-Commerce Platform with Multi-Platform Support",
+    "challenge": "Traditional retailer needed complete digital transformation with web storefront, mobile app, and admin dashboard.",
+    "solution": "Built scalable platform using Laravel backend, Nuxt.js web frontend, and native Kotlin Android app. Integrated Stripe (global) and Razorpay (India) for payments. FilamentPHP admin panel for inventory management.",
+    "results": [
+      { "value": "300%", "label": "Sales Growth" },
+      { "value": "50K+", "label": "Daily Users" },
+      { "value": "99.9%", "label": "Uptime" }
+    ],
+    "techStack": ["Laravel", "Nuxt.js", "Kotlin", "FilamentPHP", "Stripe", "Razorpay", "Redis", "PostgreSQL"],
+    "icon": "lucide:shopping-cart"
+  },
+  {
+    "id": "02",
+    "title": "Healthcare Management System",
+    "challenge": "Healthcare provider required HIPAA-compliant system with web portal, desktop app for clinics, and mobile app for patients.",
+    "solution": "Developed comprehensive healthcare ecosystem with Laravel backend, Livewire web interface, Electron desktop application, and Kotlin mobile app. End-to-end encryption, telemedicine video integration, and automated appointment reminders.",
+    "results": [
+      { "value": "15K+", "label": "Active Patients" },
+      { "value": "98%", "label": "Satisfaction" },
+      { "value": "65%", "label": "Time Saved" }
+    ],
+    "techStack": ["Laravel", "Livewire", "Electron", "Kotlin", "WebRTC", "MongoDB", "Node.js"],
+    "icon": "lucide:heart-pulse"
+  },
+  {
+    "id": "03",
+    "title": "AI-Powered FinTech Dashboard",
+    "challenge": "Financial startup needed real-time analytics dashboard with ML-based fraud detection and predictive insights.",
+    "solution": "Created advanced analytics platform using Next.js frontend, Python backend for ML models, and Laravel API layer. Integrated TensorFlow for fraud detection, real-time data processing with Redis, and automated reporting.",
+    "results": [
+      { "value": "$5M+", "label": "Protected" },
+      { "value": "99.7%", "label": "Accuracy" },
+      { "value": "2K+", "label": "Businesses" }
+    ],
+    "techStack": ["Next.js", "Python", "TensorFlow", "Laravel", "PostgreSQL", "Redis", "Docker"],
+    "icon": "lucide:trending-up"
+  }
+]

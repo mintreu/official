@@ -1,0 +1,6 @@
+[
+  { "name": "About Us", "path": "#comparison" },
+  { "name": "Services", "path": "#services" },
+  { "name": "Portfolio", "path": "#projects" },
+  { "name": "Hire Us", "path": "#hire" }
+]

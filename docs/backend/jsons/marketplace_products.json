@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Laravel Admin Panel",
+    "icon": "lucide:layout-dashboard",
+    "category": "Template",
+    "description": "Complete admin dashboard with FilamentPHP, 50+ components, dark mode, and authentication.",
+    "features": ["FilamentPHP v3", "Dark Mode", "RBAC System"],
+    "price_usd": 79,
+    "price_inr": 6499,
+    "price_unit": "one-time",
+    "demo_url": "https://demo.example.com/admin-panel",
+    "demo_admin_url": "https://demo.example.com/admin-panel/admin"
+  },
+  {
+    "name": "Nuxt Starter Kit",
+    "icon": "lucide:layers",
+    "category": "Boilerplate",
+    "description": "Production-ready Nuxt.js boilerplate with authentication, API integration, and SEO optimization.",
+    "features": ["Nuxt 3", "TypeScript", "Tailwind CSS"],
+    "price_usd": 49,
+    "price_inr": 3999,
+    "price_unit": "one-time",
+    "demo_url": "https://demo.example.com/nuxt-starter",
+    "demo_admin_url": null
+  },
+  {
+    "name": "Android UI Kit",
+    "icon": "lucide:smartphone",
+    "category": "UI Kit",
+    "description": "Beautiful Material Design components for Android apps with Kotlin code samples.",
+    "features": ["Material Design 3", "Kotlin", "30+ Screens"],
+    "price_usd": 59,
+    "price_inr": 4799,
+    "price_unit": "one-time",
+    "demo_url": "https://demo.example.com/android-ui-kit",
+    "demo_admin_url": null
+  },
+  {
+    "name": "API Starter",
+    "icon": "lucide:server",
+    "category": "Backend",
+    "description": "Laravel REST API boilerplate with authentication, rate limiting, and documentation.",
+    "features": ["Laravel 11", "JWT Auth", "Swagger Docs"],
+    "price_usd": 39,
+    "price_inr": 3199,
+    "price_unit": "one-time",
+    "demo_url": "https://demo.example.com/api-starter",
+    "demo_admin_url": "https://demo.example.com/api-starter/docs"
+  },
+  {
+    "name": "Payment Gateway Pack",
+    "icon": "lucide:credit-card",
+    "category": "Integration",
+    "description": "Ready-to-use payment integration for Stripe, PayPal, Razorpay, and Cashfree.",
+    "features": ["4 Gateways", "Webhooks", "Invoice System"],
+    "price_usd": 69,
+    "price_inr": 5699,
+    "price_unit": "one-time",
+    "demo_url": null,
+    "demo_admin_url": null
+  },
+  {
+    "name": "Code Snippets Library",
+    "icon": "lucide:code-2",
+    "category": "Tools",
+    "description": "Collection of 100+ code snippets for Laravel, Nuxt, React, and Kotlin development.",
+    "features": ["100+ Snippets", "Well Documented", "Regular Updates"],
+    "price_usd": 0,
+    "price_inr": 0,
+    "price_unit": null,
+    "demo_url": "https://demo.example.com/code-snippets",
+    "demo_admin_url": null
+  }
+]

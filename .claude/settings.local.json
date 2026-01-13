@@ -1,0 +1,13 @@
+{
+  "enabledMcpjsonServers": [
+    "laravel-backend",
+    "nuxt-ui-remote",
+    "frontend-filesystem",
+    "puppeteer"
+  ],
+  "permissions": {
+    "allow": [
+      "Bash(curl:*)"
+    ]
+  }
+}
