@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Filament\Resources\StorageCredentialResource\Pages;
+
+use App\Filament\Resources\StorageCredentialResource;
+use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
+
+class EditStorageCredential extends EditRecord
+{
+    protected static string $resource = StorageCredentialResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\DeleteAction::make(),
+        ];
+    }
+}

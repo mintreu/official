@@ -1,13 +1,16 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(curl:*)",
+      "Bash(vendor/bin/pint:*)",
+      "Bash(php:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "laravel-backend",
     "nuxt-ui-remote",
     "frontend-filesystem",
     "puppeteer"
-  ],
-  "permissions": {
-    "allow": [
-      "Bash(curl:*)"
-    ]
-  }
+  ]
 }
