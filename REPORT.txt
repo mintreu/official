@@ -1,0 +1,69 @@
+Mintreu Official - Implementation Review + Upgraded Plan (2026-01-29)
+
+SUMMARY
+- Project is a digital product + SaaS/API distribution platform (mothership).
+- Core download flow is implemented and wired in API.
+- Admin resources exist, but some are misaligned with the refactored schema.
+- Frontend ads and ads API are missing.
+
+IMPLEMENTATION SNAPSHOT (REAL CODE)
+Backend
+- Laravel 12.35, Filament 4, Sanctum 4, Livewire 3.
+- Download flow is wired:
+  - POST /api/products/{slug}/download
+  - GET /api/download/{token}
+  - GET /api/products/{slug}/sources
+- DownloadService generates masked URLs and logs download activity.
+- ProductResource exists with SourcesRelationManager.
+- AdvertisementResource exists, but model namespace mismatch.
+- StorageProvider/StorageCredential resources still exist, but tables dropped.
+
+Frontend
+- Nuxt app present. No AdZone component or ads fetching logic found.
+
+DATA MODEL (CURRENT)
+- products: short_description, meta, api_config, requires_auth, default_license
+- product_sources: unified download sources
+- licenses: type, meta, api_credential_id, plan_id, server_info
+- download_logs: product_source_id + audit fields
+- plans/api_endpoints/api_keys/api_usage_logs for API products
+
+OPEN ISSUES (SEE /issues)
+- ProductResource table/infolist uses deprecated columns (Issue 04)
+- AdvertisementResource model namespace mismatch (Issue 05)
+- Obsolete admin resources for removed tables (Issue 06)
+- Ads API + AdZone missing (Issue 03)
+
+UPGRADED PLAN (EXECUTION)
+P0: Stabilize and align
+- Fix ProductResource UI fields to match schema
+- Fix AdvertisementResource model namespace
+- Remove/hide StorageProvider & StorageCredential resources
+- Add ads API + AdZone if ads are near-term revenue
+
+P1: Revenue core
+- Checkout + webhook + license issuance flow
+- Customer dashboard for licenses/downloads/API keys
+- Vouchers + referrals (single level)
+
+P2: Scale and resilience
+- Usage tracking, rate limiting, alerts
+- Upgrade/downgrade and bundles
+- Incident playbook + audit logs
+
+RISKS
+- Admin UI mismatch can cause bad data ops.
+- Ads revenue path blocked until frontend/API exists.
+- Legacy resources may break admin navigation.
+
+REQUESTED FOUNDER INPUTS
+- Current product list + revenue estimates
+- Flagship product(s) selection
+- Payment provider and refund constraints
+- Target customer segment
+
+NEXT STEPS
+- Confirm which P0 fixes to execute now.
+- Provide product inventory for plan sequencing.
+
+END

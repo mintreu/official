@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use App\Casts\PublishableStatusCast;
+use App\Enums\LicenseType;
+use App\Enums\ProductType;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -13,7 +15,6 @@ use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
@@ -45,78 +46,92 @@ class ProductForm
                                             ->required(),
                                         TextInput::make('slug')
                                             ->required(),
-
+                                        TextInput::make('short_description')
+                                            ->maxLength(160)
+                                            ->helperText('Brief description for cards (max 160 chars)'),
                                     ]),
 
-                                Fieldset::make('General Configuration')
+                                Fieldset::make('Product Configuration')
                                     ->columnSpanFull()
                                     ->columns(2)
                                     ->schema([
-                                        Toggle::make('is_payable')
+                                        Select::make('type')
+                                            ->options(ProductType::class)
+                                            ->required()
                                             ->live()
-                                            ->required(),
+                                            ->helperText('Determines product behavior and download flow'),
 
-                                        TextInput::make('category'),
+                                        TextInput::make('category')
+                                            ->helperText('e.g., frontend, backend, games, assets'),
 
                                         TextInput::make('price')
                                             ->required()
                                             ->numeric()
-                                            ->visible(fn (Get $get) => $get('is_payable'))
                                             ->default(0.0)
-                                            ->prefix('INR'),
+                                            ->prefix('$')
+                                            ->helperText('Set 0 for free products'),
 
-                                        TextInput::make('type'),
+                                        Select::make('default_license')
+                                            ->options(LicenseType::class)
+                                            ->required()
+                                            ->default(LicenseType::FreeAttribution)
+                                            ->helperText('License type for new downloads'),
 
                                         Select::make('status')
                                             ->options(PublishableStatusCast::class)
                                             ->default('draft')
                                             ->required(),
 
-                                        Toggle::make('requires_account')
-                                            ->required(),
+                                        Toggle::make('requires_auth')
+                                            ->label('Requires Login')
+                                            ->helperText('Users must log in to download'),
+
+                                        Toggle::make('featured')
+                                            ->helperText('Show on homepage'),
                                     ]),
 
                                 Section::make('Description')
                                     ->columnSpanFull()
                                     ->schema([
-                                        RichEditor::make('description')
-                                            ->columnSpanFull(),
+                                        Textarea::make('description')
+                                            ->columnSpanFull()
+                                            ->rows(3),
                                     ]),
 
                             ]),
-                        Tab::make('Tab 2')
+                        Tab::make('Content')
                             ->schema([
-                                // ...
+                                RichEditor::make('content')
+                                    ->columnSpanFull()
+                                    ->helperText('Full product description with features, installation guide, etc.'),
                             ]),
-                        Tab::make('Tab 3')
+                        Tab::make('Links & Metadata')
+                            ->columns(2)
                             ->schema([
-                                // ...
+                                TextInput::make('demo_url')
+                                    ->url()
+                                    ->label('Demo URL'),
+                                TextInput::make('github_url')
+                                    ->url()
+                                    ->label('GitHub URL')
+                                    ->helperText('Public repo for freebies, backlinks'),
+                                TextInput::make('documentation_url')
+                                    ->url()
+                                    ->label('Documentation URL'),
+                                TextInput::make('version')
+                                    ->helperText('e.g., 1.0.0'),
+                                TextInput::make('downloads')
+                                    ->numeric()
+                                    ->default(0)
+                                    ->disabled()
+                                    ->helperText('Auto-tracked'),
+                                TextInput::make('rating')
+                                    ->numeric()
+                                    ->default(0.0)
+                                    ->disabled()
+                                    ->helperText('Auto-calculated'),
                             ]),
                     ]),
-
-                Textarea::make('content')
-                    ->columnSpanFull(),
-
-                TextInput::make('download_url'),
-                TextInput::make('demo_url'),
-                TextInput::make('github_url'),
-                TextInput::make('documentation_url'),
-                TextInput::make('version'),
-                TextInput::make('downloads')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-                TextInput::make('rating')
-                    ->required()
-                    ->numeric()
-                    ->default(0.0),
-
-                Toggle::make('featured')
-                    ->required(),
-
-                TextInput::make('default_license_type')
-                    ->required()
-                    ->default('FREE_ATTRIBUTION'),
             ]);
     }
 }

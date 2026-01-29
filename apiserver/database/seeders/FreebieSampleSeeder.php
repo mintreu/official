@@ -3,8 +3,11 @@
 namespace Database\Seeders;
 
 use App\Casts\PublishableStatusCast;
+use App\Enums\LicenseType;
+use App\Enums\ProductType;
+use App\Enums\SourceProvider;
 use App\Models\Product;
-use App\Models\ProductConfig;
+use App\Models\Products\ProductSource;
 use Illuminate\Database\Seeder;
 
 class FreebieSampleSeeder extends Seeder
@@ -20,7 +23,7 @@ class FreebieSampleSeeder extends Seeder
                 'image' => 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800',
                 'price' => 0,
                 'category' => 'frontend',
-                'type' => 'template',
+                'type' => ProductType::Freebie,
                 'demo_url' => 'https://account.mintreu.com/freebies/template-demo',
                 'github_url' => null,
                 'documentation_url' => null,
@@ -29,9 +32,8 @@ class FreebieSampleSeeder extends Seeder
                 'rating' => 4.5,
                 'status' => PublishableStatusCast::PUBLISHED,
                 'featured' => true,
-                'is_payable' => false,
-                'requires_account' => false,
-                'default_license_type' => 'FREE_ATTRIBUTION',
+                'requires_auth' => false,
+                'default_license' => LicenseType::FreeAttribution,
             ],
 
             [
@@ -42,7 +44,7 @@ class FreebieSampleSeeder extends Seeder
                 'image' => 'https://images.unsplash.com/photo-1552820728-8ac41f1ce891?w=800',
                 'price' => 0,
                 'category' => 'games',
-                'type' => 'game',
+                'type' => ProductType::Freebie,
                 'demo_url' => 'https://account.mintreu.com/freebies/snake-game',
                 'github_url' => null,
                 'documentation_url' => null,
@@ -51,9 +53,8 @@ class FreebieSampleSeeder extends Seeder
                 'rating' => 4.3,
                 'status' => PublishableStatusCast::PUBLISHED,
                 'featured' => true,
-                'is_payable' => false,
-                'requires_account' => false,
-                'default_license_type' => 'FREE_UNLIMITED',
+                'requires_auth' => false,
+                'default_license' => LicenseType::FreeUnlimited,
             ],
 
             [
@@ -64,7 +65,7 @@ class FreebieSampleSeeder extends Seeder
                 'image' => 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800',
                 'price' => 0,
                 'category' => 'assets',
-                'type' => 'media',
+                'type' => ProductType::Freebie,
                 'demo_url' => 'https://account.mintreu.com/freebies/icons',
                 'github_url' => null,
                 'documentation_url' => null,
@@ -73,9 +74,8 @@ class FreebieSampleSeeder extends Seeder
                 'rating' => 4.6,
                 'status' => PublishableStatusCast::PUBLISHED,
                 'featured' => true,
-                'is_payable' => false,
-                'requires_account' => false,
-                'default_license_type' => 'FREE_ATTRIBUTION',
+                'requires_auth' => false,
+                'default_license' => LicenseType::FreeAttribution,
             ],
 
             [
@@ -86,7 +86,7 @@ class FreebieSampleSeeder extends Seeder
                 'image' => 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800',
                 'price' => 0,
                 'category' => 'frontend',
-                'type' => 'template',
+                'type' => ProductType::Freebie,
                 'demo_url' => 'https://account.mintreu.com/freebies/ui-components',
                 'github_url' => null,
                 'documentation_url' => null,
@@ -95,9 +95,8 @@ class FreebieSampleSeeder extends Seeder
                 'rating' => 4.7,
                 'status' => PublishableStatusCast::PUBLISHED,
                 'featured' => false,
-                'is_payable' => false,
-                'requires_account' => false,
-                'default_license_type' => 'FREE_ATTRIBUTION',
+                'requires_auth' => false,
+                'default_license' => LicenseType::FreeAttribution,
             ],
         ];
 
@@ -105,17 +104,17 @@ class FreebieSampleSeeder extends Seeder
             $product = Product::create($freebie);
 
             // Create local storage config for each freebie
-            ProductConfig::create([
+            ProductSource::create([
                 'product_id' => $product->id,
-                'storage_credential_id' => null,
-                'source_type' => 'LOCAL_STORAGE',
-                'source_identifier' => 'freebies/demo/'.str_replace(' ', '-', strtolower($freebie['title'])),
+                'provider' => SourceProvider::LocalStorage,
+                'name' => 'Direct Download',
+                'source_url' => 'https://example.com/freebies/demo/'.str_replace(' ', '-', strtolower($freebie['title'])).'.zip',
                 'metadata' => [
                     'description' => 'Freebie stored in safe location',
-                    'type' => $freebie['type'],
+                    'type' => 'freebie',
                 ],
                 'is_primary' => true,
-                'is_private' => false,
+                'is_active' => true,
             ]);
         }
     }

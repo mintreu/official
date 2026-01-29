@@ -8,6 +8,8 @@ use App\Models\Products\DownloadLog;
 use App\Models\Products\ProductSource;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /**
@@ -129,31 +131,164 @@ class DownloadService
 
     /**
      * Build authenticated download URL for private sources
+     *
+     * For private GitHub repos, we make an authenticated API request
+     * that returns a temporary S3 URL (no auth needed for redirect).
      */
     private function buildAuthenticatedUrl(ProductSource $source): string
     {
         $baseUrl = $source->source_url;
 
-        // For GitHub/GitLab/etc, append auth token if available
-        if ($source->encrypted_token) {
-            $token = $source->getToken();
+        // Get effective token (GitProviderToken > encrypted_token > config)
+        $token = $source->getEffectiveToken();
 
-            // GitHub private repo format
-            if ($source->provider->value === 'github') {
-                // GitHub accepts token in URL for releases
-                // Format: https://api.github.com/repos/owner/repo/releases/assets/{id}
-                // with Authorization header, but for direct download we use:
-                if (str_contains($baseUrl, 'github.com')) {
-                    return $baseUrl.(str_contains($baseUrl, '?') ? '&' : '?').'token='.$token;
-                }
-            }
+        // GitHub private repo handling
+        if ($source->provider->value === 'github' && $token) {
+            return $this->getGitHubAuthenticatedUrl($baseUrl, $token, $source);
+        }
 
-            // For other providers, token might be used differently
-            // S3 presigned URLs, GDrive tokens, etc.
-            // Store the full presigned URL or generate it here based on provider
+        // GitLab private repo handling
+        if ($source->provider->value === 'gitlab' && $token) {
+            return $this->getGitLabAuthenticatedUrl($baseUrl, $token);
         }
 
         return $baseUrl;
+    }
+
+    /**
+     * Get authenticated download URL for GitHub private repos
+     *
+     * GitHub's API returns a 302 redirect to a temporary pre-signed S3 URL
+     * that doesn't require authentication. We follow the redirect to get that URL.
+     */
+    private function getGitHubAuthenticatedUrl(string $baseUrl, string $token, ProductSource $source): string
+    {
+        // Build API URL from github.com URL or use as-is if already API URL
+        $apiUrl = $this->convertToGitHubApiUrl($baseUrl, $source);
+
+        if (! $apiUrl) {
+            Log::warning('Could not convert to GitHub API URL', ['url' => $baseUrl]);
+
+            return $baseUrl;
+        }
+
+        try {
+            // Make request but don't follow redirects - we want the redirect URL
+            $response = Http::withToken($token)
+                ->withHeaders([
+                    'Accept' => 'application/vnd.github+json',
+                    'X-GitHub-Api-Version' => '2022-11-28',
+                ])
+                ->withOptions(['allow_redirects' => false])
+                ->get($apiUrl);
+
+            // GitHub returns 302 with Location header pointing to S3
+            if ($response->status() === 302) {
+                $redirectUrl = $response->header('Location');
+                if ($redirectUrl) {
+                    Log::info('GitHub redirect URL obtained', ['url' => substr($redirectUrl, 0, 100).'...']);
+
+                    return $redirectUrl;
+                }
+            }
+
+            // If we got a 200, GitHub returned the content directly (shouldn't happen for archives)
+            if ($response->successful()) {
+                Log::warning('GitHub returned 200 instead of redirect', ['status' => $response->status()]);
+
+                return $baseUrl;
+            }
+
+            Log::warning('GitHub API request failed', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('GitHub authenticated URL request failed', [
+                'error' => $e->getMessage(),
+                'url' => $apiUrl,
+            ]);
+        }
+
+        return $baseUrl;
+    }
+
+    /**
+     * Convert github.com URLs to API URLs
+     */
+    private function convertToGitHubApiUrl(string $url, ProductSource $source): ?string
+    {
+        // Already an API URL
+        if (str_contains($url, 'api.github.com')) {
+            return $url;
+        }
+
+        // Get owner/repo from metadata or parse URL
+        $metadata = $source->metadata ?? [];
+        $owner = $metadata['owner'] ?? null;
+        $repo = $metadata['repo'] ?? null;
+
+        // Parse from URL if not in metadata
+        if (! $owner || ! $repo) {
+            if (preg_match('#github\.com/([^/]+)/([^/]+)#', $url, $matches)) {
+                $owner = $matches[1];
+                $repo = rtrim($matches[2], '.git');
+            }
+        }
+
+        if (! $owner || ! $repo) {
+            return null;
+        }
+
+        // Archive URL: https://github.com/owner/repo/archive/refs/tags/v1.zip
+        if (preg_match('#/archive/refs/(heads|tags)/([^/]+)\.zip#', $url, $matches)) {
+            $ref = $matches[2];
+
+            return "https://api.github.com/repos/{$owner}/{$repo}/zipball/{$ref}";
+        }
+
+        // Zipball URL from API
+        if (preg_match('#/zipball/(.+)$#', $url, $matches)) {
+            $ref = $matches[1];
+
+            return "https://api.github.com/repos/{$owner}/{$repo}/zipball/{$ref}";
+        }
+
+        // Release asset URL: https://github.com/owner/repo/releases/download/v1/file.zip
+        if (preg_match('#/releases/download/([^/]+)/(.+)$#', $url, $matches)) {
+            // For release assets, we need to find the asset ID
+            // This is more complex - for now, return the direct URL
+            return $url;
+        }
+
+        // Fallback: use version from source as ref
+        $ref = $source->version ?? 'main';
+
+        return "https://api.github.com/repos/{$owner}/{$repo}/zipball/{$ref}";
+    }
+
+    /**
+     * Get authenticated download URL for GitLab private repos
+     */
+    private function getGitLabAuthenticatedUrl(string $baseUrl, string $token): string
+    {
+        // GitLab allows token as query parameter
+        $separator = str_contains($baseUrl, '?') ? '&' : '?';
+
+        return $baseUrl.$separator.'private_token='.$token;
+    }
+
+    /**
+     * Get provider token from config
+     */
+    private function getProviderToken(string $provider): ?string
+    {
+        return match ($provider) {
+            'github' => config('services.github.token'),
+            'gitlab' => config('services.gitlab.token'),
+            'bitbucket' => config('services.bitbucket.password'),
+            default => null,
+        };
     }
 
     /**

@@ -3,6 +3,7 @@ import type {
   CaseStudy,
   Product,
   Article,
+  Category,
   HomePageData,
   ApiResponse,
   PaginatedResponse
@@ -46,7 +47,7 @@ export default function useApi() {
   const getCaseStudies = (params?: {
     page?: number
     per_page?: number
-    industry?: string
+    category?: string
     featured?: boolean
     search?: string
     sort?: 'latest' | 'oldest' | 'title' | 'popular'
@@ -101,57 +102,25 @@ export default function useApi() {
     })
   }
 
-  const getArticle = (slug: string) => {
-    return useSanctumFetch<ApiResponse<Article>>(`/api/articles/${slug}`, {
-      method: 'GET'
-    })
-  }
-
-  // ==================== CONTACT FORM ====================
-  const submitContact = (data: {
-    name: string
-    email: string
-    project_type?: string
-    budget?: string
-    message: string
+  // ==================== CATEGORIES ====================
+  const getCategories = (params?: {
+    type?: string
   }) => {
-    return useSanctumFetch<ApiResponse<null>>('/api/contact', {
-      method: 'POST',
-      body: data
-    })
-  }
-
-  // ==================== HEALTH CHECK ====================
-  const healthCheck = () => {
-    return useSanctumFetch<{ status: string; timestamp: string }>('/api/health', {
-      method: 'GET'
+    return useSanctumFetch<Category[]>('/api/categories', {
+      method: 'GET',
+      params
     })
   }
 
   return {
-    // Home
     getHomeData,
-
-    // Projects
     getProjects,
     getProject,
-
-    // Case Studies
     getCaseStudies,
     getCaseStudy,
-
-    // Products/Marketplace
     getProducts,
     getProduct,
-
-    // Articles/Insights
     getArticles,
-    getArticle,
-
-    // Contact Form
-    submitContact,
-
-    // Health
-    healthCheck
+    getCategories
   }
 }

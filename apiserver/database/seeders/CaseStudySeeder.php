@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Casts\PublishableStatusCast;
-use App\Models\CaseStudy;
+use App\Models\Content\CaseStudy;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -26,7 +26,7 @@ class CaseStudySeeder extends Seeder
                 'results' => json_encode([
                     ['value' => '300%', 'label' => 'Sales Growth'],
                     ['value' => '50K+', 'label' => 'Daily Users'],
-                    ['value' => '99.9%', 'label' => 'Uptime']
+                    ['value' => '99.9%', 'label' => 'Uptime'],
                 ]),
                 'status' => PublishableStatusCast::PUBLISHED,
                 'featured' => true,
@@ -45,7 +45,7 @@ class CaseStudySeeder extends Seeder
                 'results' => json_encode([
                     ['value' => '15K+', 'label' => 'Active Patients'],
                     ['value' => '98%', 'label' => 'Satisfaction'],
-                    ['value' => '65%', 'label' => 'Time Saved']
+                    ['value' => '65%', 'label' => 'Time Saved'],
                 ]),
                 'status' => PublishableStatusCast::PUBLISHED,
                 'featured' => true,
@@ -64,7 +64,7 @@ class CaseStudySeeder extends Seeder
                 'results' => json_encode([
                     ['value' => '$5M+', 'label' => 'Protected'],
                     ['value' => '99.7%', 'label' => 'Accuracy'],
-                    ['value' => '2K+', 'label' => 'Businesses']
+                    ['value' => '2K+', 'label' => 'Businesses'],
                 ]),
                 'status' => PublishableStatusCast::PUBLISHED,
                 'featured' => true,

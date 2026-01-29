@@ -3,7 +3,10 @@
 namespace App\Models\Products;
 
 use App\Enums\SourceProvider;
+use App\Models\GitAccountToken;
 use App\Models\Product;
+use Database\Factories\ProductSourceFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Crypt;
@@ -22,7 +25,8 @@ use Illuminate\Support\Facades\Crypt;
  * @property string $name
  * @property string|null $description
  * @property string $source_url Real download URL (private, never exposed)
- * @property string|null $encrypted_token Auth token for private repos (encrypted)
+ * @property string|null $encrypted_token Auth token for private repos (encrypted) - DEPRECATED, use git_account_token_id
+ * @property int|null $git_account_token_id Reference to GitAccountToken
  * @property string|null $version Version tag (e.g., "v1.2.0")
  * @property string|null $file_name Expected filename for download
  * @property int|null $file_size File size in bytes (for display)
@@ -33,6 +37,14 @@ use Illuminate\Support\Facades\Crypt;
  */
 class ProductSource extends Model
 {
+    /** @use HasFactory<ProductSourceFactory> */
+    use HasFactory;
+
+    protected static function newFactory(): ProductSourceFactory
+    {
+        return ProductSourceFactory::new();
+    }
+
     protected $fillable = [
         'product_id',
         'provider',
@@ -40,6 +52,7 @@ class ProductSource extends Model
         'description',
         'source_url',
         'encrypted_token',
+        'git_account_token_id',
         'version',
         'file_name',
         'file_size',
@@ -67,7 +80,44 @@ class ProductSource extends Model
     }
 
     /**
-     * Get decrypted auth token
+     * Git account token (for multi-account support)
+     */
+    public function gitAccountToken(): BelongsTo
+    {
+        return $this->belongsTo(GitAccountToken::class);
+    }
+
+    /**
+     * Get auth token with fallback chain:
+     * 1. GitAccountToken (preferred - multi-account)
+     * 2. encrypted_token (legacy - per-source)
+     * 3. config token (fallback - global)
+     */
+    public function getEffectiveToken(): ?string
+    {
+        // 1. Check linked GitAccountToken
+        if ($this->git_account_token_id && $this->gitAccountToken?->isUsable()) {
+            $this->gitAccountToken->markUsed();
+
+            return $this->gitAccountToken->getToken();
+        }
+
+        // 2. Check legacy encrypted_token on source
+        if ($this->encrypted_token) {
+            return Crypt::decryptString($this->encrypted_token);
+        }
+
+        // 3. Fall back to config token
+        return match ($this->provider->value) {
+            'github' => config('services.github.token'),
+            'gitlab' => config('services.gitlab.token'),
+            'bitbucket' => config('services.bitbucket.password'),
+            default => null,
+        };
+    }
+
+    /**
+     * Get decrypted auth token (legacy - use getEffectiveToken instead)
      */
     public function getToken(): ?string
     {

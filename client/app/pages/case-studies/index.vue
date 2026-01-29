@@ -173,13 +173,22 @@ const api = useApi()
 const page = ref(1)
 const activeFilter = ref('All')
 
-const filters = ['All', 'Healthcare', 'E-Commerce', 'FinTech', 'SaaS', 'Education', 'Enterprise']
+const { data: rawCategories } = await useAsyncData('categories-case-studies', () => api.getCategories({ type: 'case-studies' }));\nconst filters = ref(['All']);
+const api = useApi();
+onMounted(async () => {
+  try {
+    const rawCategories = await api.getCategories({ type: 'case-studies' });
+    filters.value = ['All', ...rawCategories.map(c => c.name)];
+  } catch (error) {
+    console.error('Failed to load categories', error);
+  }
+});
 
 const { data: caseStudies, pending } = await useAsyncData<PaginatedResponse<CaseStudy>>(
   'case-studies',
   () => api.getCaseStudies({
     page: page.value,
-    industry: activeFilter.value !== 'All' ? activeFilter.value : undefined,
+    category: activeFilter.value !== 'All' ? activeFilter.value : undefined,
     per_page: 6
   }),
   { watch: [page, activeFilter] }

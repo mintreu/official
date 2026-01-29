@@ -35,4 +35,28 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Git Provider Credentials
+    |--------------------------------------------------------------------------
+    |
+    | Tokens for accessing private repositories on various git hosting
+    | platforms. These are used for fetching releases and downloading
+    | private repo assets.
+    |
+    */
+
+    'github' => [
+        'token' => env('GITHUB_TOKEN'),
+    ],
+
+    'gitlab' => [
+        'token' => env('GITLAB_TOKEN'),
+    ],
+
+    'bitbucket' => [
+        'username' => env('BITBUCKET_USERNAME'),
+        'password' => env('BITBUCKET_APP_PASSWORD'),
+    ],
+
 ];

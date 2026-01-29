@@ -98,61 +98,13 @@ export interface Article {
   slug: string
   excerpt: string
   content: string
-  image: string
-  category: string
-  tags: string[]
-  author: string
-  reading_time: number
-  status: 'draft' | 'published' | 'archived'
-  featured: boolean
-  published_at: string
-  created_at: string
-  updated_at: string
 }
 
-// Auth Types
-export interface User {
+// Category Types
+export interface Category {
   id: number
+  slug: string
   name: string
-  email: string
-  email_verified_at?: string
-  created_at: string
-  updated_at: string
-}
-
-export interface LoginCredentials {
-  email: string
-  password: string
-}
-
-export interface RegisterCredentials {
-  name: string
-  email: string
-  password: string
-  password_confirmation: string
-}
-
-export interface AuthResponse {
-  user: User
-  token: string
-}
-
-// Home Page Data
-export interface HomePageData {
-  featured_projects: Project[]
-  featured_case_studies: CaseStudy[]
-  featured_products: Product[]
-  latest_articles: Article[]
-  stats: {
-    projects: number
-    clients: number
-    years: number
-    technologies: number
-  }
-}
-
-// API Error Response
-export interface ApiError {
-  message: string
-  errors?: Record<string, string[]>
+  order?: number
+  is_active?: boolean
 }

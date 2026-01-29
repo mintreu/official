@@ -1,113 +1,90 @@
-# Database Schema
+# Database Schema (Marketplace Core)
 
-This document outlines the database schema for the backend application, based on the models required by the frontend.
+This document summarizes the current marketplace-related schema. Migrations are the source of truth.
 
-## User Model
+## Users
+- id, name, email, password, email_verified_at, about, remember_token, timestamps
 
-The `users` table stores user account information for authentication.
+## Products
+- id, slug, title, description, content, image
+- short_description, price, category, type, version
+- demo_url, github_url, documentation_url
+- downloads, rating, status, featured
+- requires_auth, default_license
+- meta (json), api_config (json)
+- timestamps
 
--   `id`: `bigIncrements` (Primary Key)
--   `name`: `string`
--   `email`: `string`, `unique`
--   `email_verified_at`: `timestamp`, `nullable`
--   `password`: `string`
--   `about`: `text`, `nullable`
--   `remember_token`: `rememberToken`
--   `timestamps`: `timestamps`
+## Product Sources
+- product_id (FK)
+- provider, name, description
+- source_url, encrypted_token
+- version, file_name, file_size
+- metadata (json)
+- is_primary, is_active
+- last_verified_at, timestamps
 
-## Project Model
+## Licenses
+- product_id, user_id
+- type, usage_count, max_usage
+- meta (json), server_info (json)
+- api_credential_id (FK), plan_id (FK)
+- expires_at, is_active, first_used_at, last_used_at
+- timestamps
 
-The `projects` table stores information about the featured projects.
+## Download Logs
+- product_id, product_source_id, user_id, license_id
+- ip_address, user_agent, status
+- download_token, file_size, downloaded_at
+- timestamps
 
--   `id`: `bigIncrements` (Primary Key)
--   `title`: `string`
--   `description`: `text`
--   `icon`: `string`
--   `platform`: `string`
--   `tech`: `json`
--   `duration`: `string`
--   `result`: `string`
--   `timestamps`: `timestamps`
+## External API Credentials
+- product_id, user_id
+- encrypted_api_key, encrypted_api_secret
+- external_user_id, external_account_url
+- plan_id, rate_limits (json), usage_stats (json), meta (json)
+- is_active, last_synced_at, expires_at
+- timestamps
 
-## Case Study Model
+## Plans (API / Subscription)
+- product_id, slug, name, description
+- price_cents, billing_cycle
+- requests_per_month, requests_per_day, requests_per_minute
+- features (json), limits (json)
+- sort_order, is_popular, is_active
+- timestamps
 
-The `case_studies` table stores information about client success stories.
+## API Endpoints
+- product_id, method, path, name, description
+- base_url, weight, is_public, is_active
+- params (json), response (json)
+- timestamps
 
--   `id`: `bigIncrements` (Primary Key)
--   `title`: `string`
--   `challenge`: `text`
--   `solution`: `text`
--   `results`: `json` (Array of objects with `value` and `label`)
--   `techStack`: `json` (Array of strings)
--   `icon`: `string`
--   `timestamps`: `timestamps`
+## API Keys
+- product_id, license_id, plan_id, user_id
+- key_hash, key_prefix, name
+- domain_restriction, ip_whitelist (json)
+- requests_this_month, requests_today
+- last_used_at, expires_at, is_active
+- timestamps
 
-## Service Model
+## API Usage Logs
+- api_key_id, api_endpoint_id
+- method, path, status_code, response_time_ms
+- request_size, response_size
+- ip_address, user_agent, referer, country
+- request_headers (json), error_details (json)
+- created_at
 
-The `services` table stores information about the services offered.
+## Advertisements
+- name, placement, html_code, allowed_pages
+- priority, impressions, clicks, unique_ips, viewed_ips
+- max_impressions_per_ip, is_active
+- starts_at, ends_at
+- timestamps
 
--   `id`: `bigIncrements` (Primary Key)
--   `title`: `string`
--   `icon`: `string`
--   `description`: `text`
--   `features`: `json` (Array of strings)
--   `timestamps`: `timestamps`
+## Marketing Content (Legacy / Site Content)
+- projects
+- case_studies
+- services
 
-## Category Model
-
-The `categories` table stores information about product categories.
-
--   `id`: `bigIncrements` (Primary Key)
--   `name`: `string`
--   `slug`: `string`, `unique`
--   `timestamps`: `timestamps`
-
-## Product Model
-
-
-
-The `products` table stores information about the products in the marketplace.
-
-
-
--   `id`: `bigIncrements` (Primary Key)
-
--   `name`: `string`
-
--   `icon`: `string`
-
--   `category_id`: `foreignId` (References `id` on `categories` table)
-
--   `description`: `text`
-
--   `features`: `json` (Array of strings)
-
--   `price`: `unsignedBigInteger`
-
--   `demo_url`: `string`, `nullable`
-
--   `demo_admin_url`: `string`, `nullable`
-
--   `timestamps`: `timestamps`
-
-
-
-## License Model
-
-
-
-The `licenses` table stores information about product licenses purchased by customers.
-
-
-
--   `id`: `bigIncrements` (Primary Key)
-
--   `user_id`: `foreignId` (References `id` on `users` table)
-
--   `product_id`: `foreignId` (References `id` on `products` table)
-
--   `license_key`: `string`, `unique`
-
--   `expires_at`: `timestamp`, `nullable`
-
--   `timestamps`: `timestamps`
+Note: If any conflict appears between this document and migrations, migrations win.

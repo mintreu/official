@@ -63,7 +63,7 @@ class ProductController extends Controller
             $query->orderByDesc('price');
         }
 
-        $paginator = $query->paginate($perPage);
+        $query->with('categories');\n        $paginator = $query->paginate($perPage);
         $paginator->getCollection()->transform(function ($item) {
             return (new ProductResource($item))->toArray(request());
         });

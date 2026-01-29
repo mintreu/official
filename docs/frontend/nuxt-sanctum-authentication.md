@@ -11,7 +11,7 @@ The `@qirolab/nuxt-sanctum-authentication` module integrates Laravel Sanctum wit
 The module is configured in `nuxt.config.ts` as follows:
 
 ```typescript
-// ✅ Laravel Sanctum Configuration
+// Laravel Sanctum Configuration
 laravelSanctum: {
   apiUrl: 'https://localhost:8000',
   authMode: 'cookie',
@@ -24,32 +24,30 @@ laravelSanctum: {
 },
 ```
 
-- **`apiUrl`**: The base URL of the Laravel API.
-- **`authMode`**: The authentication mode, which is set to `cookie` for session-based authentication.
-- **`userResponseWrapperKey`**: The key in the user response that contains the user data.
-- **`sanctumEndpoints`**: The endpoints for CSRF, login, and logout.
+- `apiUrl`: Base URL of the Laravel API
+- `authMode`: Authentication mode (cookie for session-based auth)
+- `userResponseWrapperKey`: Key that contains user data
+- `sanctumEndpoints`: Endpoints for CSRF, login, and logout
 
 ## Composables
 
 The module provides two main composables: `useSanctum` and `useSanctumFetch`.
 
-### `useSanctum()`
+### useSanctum()
 
 The `useSanctum()` composable is the primary tool for managing authentication.
 
-#### Properties
+Properties:
+- `user`: Current authenticated user
+- `isLoggedIn`: Boolean for auth state
+- `options`: Module configuration options
 
-- **`user`**: Holds the data of the currently authenticated user.
-- **`isLoggedIn`**: A boolean property indicating whether a user is currently authenticated.
-- **`options`**: Provides access to the module's configuration options.
+Methods:
+- `login(credentials, clientOptions?, callback?)`
+- `logout()`
+- `refreshUser()`
 
-#### Methods
-
-- **`login(credentials, clientOptions?, callback?)`**: Authenticates users by sending their credentials to the Laravel backend.
-- **`logout()`**: Logs out the authenticated user.
-- **`refreshUser()`**: Manually re-fetches and updates the current user's data from the backend.
-
-**Example Usage:**
+Example:
 
 ```vue
 <script setup lang="ts">
@@ -72,11 +70,11 @@ async function handleLogout() {
 </script>
 ```
 
-### `useSanctumFetch()`
+### useSanctumFetch()
 
-The `useSanctumFetch()` composable is a wrapper around Nuxt's `useFetch` that automatically handles authentication and CSRF tokens for API requests. It ensures that the CSRF token is obtained before making any state-modifying requests (e.g., POST, PUT, DELETE).
+`useSanctumFetch()` wraps Nuxt's `useFetch` and handles CSRF + auth automatically.
 
-**Example Usage:**
+Example:
 
 ```vue
 <script setup lang="ts">

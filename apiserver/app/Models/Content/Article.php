@@ -16,7 +16,6 @@ class Article extends Model
         'excerpt',
         'content',
         'image',
-        'category',
         'tags',
         'author',
         'reading_time',
@@ -31,6 +30,16 @@ class Article extends Model
         'published_at' => 'datetime',
         'status' => \App\Casts\PublishableStatusCast::class,
     ];
+
+    public function categories(): \Illuminate\Database\Eloquent\Relations\MorphToMany
+    {
+        return $this->morphToMany(\App\Models\Category::class, 'categoryable');
+    }
+
+    public function getCategoriesNamesAttribute(): array
+    {
+        return $this->categories->pluck('name')->toArray();
+    }
 
     protected static function booted(): void
     {

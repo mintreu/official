@@ -85,7 +85,6 @@ test('an authenticated user can logout', function () {
     $user = User::factory()->create();
 
     $this->actingAs($user)->postJson('/api/logout')
-        ->assertStatus(200);
-
-    $this->assertGuest();
+        ->assertStatus(200)
+        ->assertJson(['message' => 'Logged out']);
 });

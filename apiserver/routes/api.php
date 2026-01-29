@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\CaseStudyController;
 use App\Http\Controllers\Api\ContactController;
+use App\Http\Controllers\Api\DownloadController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\PageDataController;
 use App\Http\Controllers\Api\ProductController;
@@ -26,7 +27,13 @@ Route::get('/case-studies/{slug}', [CaseStudyController::class, 'show']);
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
+Route::get('/products/{slug}/sources', [DownloadController::class, 'sources']);
+Route::post('/products/{slug}/download', [DownloadController::class, 'initiate']);
 
+// Download route (token-based, no auth required as token validates)
+Route::get('/download/{token}', [DownloadController::class, 'download'])->name('api.download');
+
+Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/articles', [ArticleController::class, 'index']);
 Route::get('/articles/{slug}', [ArticleController::class, 'show']);
 

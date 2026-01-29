@@ -38,6 +38,11 @@ class License extends Model
 {
     use HasFactory;
 
+    protected static function newFactory(): \Database\Factories\LicenseFactory
+    {
+        return \Database\Factories\LicenseFactory::new();
+    }
+
     protected $fillable = [
         'product_id',
         'plan_id',

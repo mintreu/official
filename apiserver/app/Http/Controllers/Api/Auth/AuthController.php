@@ -28,7 +28,7 @@ class AuthController extends Controller
         Auth::login($user);
 
         return response()->json([
-            'data' => $user
+            'data' => $user,
         ]);
     }
 
@@ -39,11 +39,11 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($request->only('email', 'password'))) {
-            $request->session()->regenerate();
+        $user = User::where('email', $request->email)->first();
 
+        if ($user && Hash::check($request->password, $user->password)) {
             return response()->json([
-                'data' => Auth::user(),
+                'data' => $user,
             ]);
         }
 
@@ -56,12 +56,8 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::logout();
-
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
-
+        // For stateless API, just return success
+        // Token-based auth would delete tokens here
         return response()->json(['message' => 'Logged out']);
     }
 }

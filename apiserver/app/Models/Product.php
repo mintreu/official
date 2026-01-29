@@ -56,7 +56,6 @@ class Product extends Model
         'content',
         'image',
         'price',
-        'category',
         'type',
         'demo_url',
         'github_url',
@@ -244,12 +243,7 @@ class Product extends Model
 
     // ===== BOOT =====
 
-    protected static function booted(): void
-    {
-        static::creating(function (Product $product) {
-            if (empty($product->slug)) {
-                $product->slug = Str::slug($product->title);
-            }
-        });
-    }
+
+
 }
+

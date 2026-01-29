@@ -101,7 +101,7 @@ class Plan extends Model
             return 'Free';
         }
 
-        return '$'.number_format($this->price / 100, 2);
+        return '$'.number_format($this->price, 2);
     }
 
     /**

@@ -1,8 +1,11 @@
 <?php
 
-use App\Models\Activity;
+use App\Models\Content\Activity;
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
 
 describe('Analytics', function () {
 

@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Casts\PublishableStatusCast;
-use App\Models\Article;
+use App\Models\Content\Article;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 

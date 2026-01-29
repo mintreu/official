@@ -2,6 +2,8 @@
 
 namespace App\Models\Content;
 
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,6 +11,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Activity extends Model
 {
     use HasFactory;
+
+    protected static function newFactory(): \Database\Factories\ActivityFactory
+    {
+        return \Database\Factories\ActivityFactory::new();
+    }
 
     protected $fillable = [
         'product_id',

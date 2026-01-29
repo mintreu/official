@@ -217,7 +217,7 @@ const searchQuery = ref('')
 const activeCategory = ref('All')
 const sortBy = ref('latest')
 
-const categories = ['All', 'Laravel', 'Nuxt', 'React', 'Mobile', 'DevOps', 'Best Practices']
+const { data: rawCategories } = await useAsyncData('categories-articles', () => api.getCategories({ type: 'articles' }));\nconst categories = computed(() => ['All', ...(rawCategories.value || []).map(c => c.name)])
 
 const { data: articles, pending } = await useAsyncData<PaginatedResponse<Article>>(
   'articles',

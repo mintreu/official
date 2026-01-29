@@ -1,13 +1,13 @@
 <?php
 
 use App\Enums\LicenseType;
-use App\Models\License;
+use App\Models\Licensing\License;
 use App\Models\Product;
 use App\Models\User;
 
 describe('License Model', function () {
     beforeEach(function () {
-        $this->product = Product::factory()->create(['is_payable' => true]);
+        $this->product = Product::factory()->create();
         $this->user = User::factory()->create();
     });
 
@@ -128,18 +128,18 @@ describe('License Model', function () {
                 ->for($this->product)
                 ->for($this->user)
                 ->create([
-                    'license_type' => LicenseType::FREE_SINGLE_USE,
+                    'type' => LicenseType::FreeSingleUse,
                 ]);
 
-            expect($license->license_type)->toBe(LicenseType::FREE_SINGLE_USE);
+            expect($license->type)->toBe(LicenseType::FreeSingleUse);
         });
 
-        it('commercial 3 uses license enforces limit', function () {
+        it('commercial team license enforces limit', function () {
             $license = License::factory()
                 ->for($this->product)
                 ->for($this->user)
                 ->create([
-                    'license_type' => LicenseType::COMMERCIAL_3_USES,
+                    'type' => LicenseType::CommercialTeam,
                     'max_usage' => 3,
                     'usage_count' => 3,
                 ]);
@@ -157,11 +157,11 @@ describe('License Model', function () {
                 ->for($this->product)
                 ->for($this->user)
                 ->create([
-                    'license_type' => LicenseType::API_SUBSCRIPTION,
-                    'api_config' => $config,
+                    'type' => LicenseType::ApiSubscription,
+                    'meta' => $config,
                 ]);
 
-            expect($license->api_config)->toMatchArray($config);
+            expect($license->meta)->toMatchArray($config);
         });
     });
 

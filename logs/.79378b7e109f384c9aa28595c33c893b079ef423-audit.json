@@ -39,6 +39,26 @@
             "date": 1768633221142,
             "name": "C:\\laragon\\www\\mintreu\\server\\official\\logs\\mcp-puppeteer-2026-01-17.log",
             "hash": "e12f76d4c926a21a9d6d8be38e1aa311e9e739eaa4b45160cdb0218f55505d16"
+        },
+        {
+            "date": 1768942429038,
+            "name": "C:\\laragon\\www\\mintreu\\server\\official\\logs\\mcp-puppeteer-2026-01-21.log",
+            "hash": "675d5b85e1b94264798f381db1cb42d48ac438fb7379fd3304b0c8828383a2a0"
+        },
+        {
+            "date": 1769031063559,
+            "name": "C:\\laragon\\www\\mintreu\\server\\official\\logs\\mcp-puppeteer-2026-01-22.log",
+            "hash": "c4895abd4dd21d01d387adaade25ba00461c120a05b3d8a5668d915b9ae0892e"
+        },
+        {
+            "date": 1769110373005,
+            "name": "C:\\laragon\\www\\mintreu\\server\\official\\logs\\mcp-puppeteer-2026-01-23.log",
+            "hash": "8e1a67c14a75435f521594cb2f7607b94fed8507ab2dc9191dfc0f8081940bf6"
+        },
+        {
+            "date": 1769196170121,
+            "name": "C:\\laragon\\www\\mintreu\\server\\official\\logs\\mcp-puppeteer-2026-01-24.log",
+            "hash": "16fec6453b1146b8efddad7bedf1f2d3d75a48133f293b41e6aaf0b6640706af"
         }
     ],
     "hashType": "sha256"

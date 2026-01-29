@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CaseStudyResource;
-use App\Models\CaseStudy;
+use App\Models\Content\CaseStudy;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
