@@ -1,176 +1,42 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-950">
-    <!-- Hero Section -->
-    <section class="py-20 lg:py-32 relative overflow-hidden">
-      <div class="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-pink-600/5"></div>
+  <div class="min-h-screen bg-titanium-50 dark:bg-titanium-950 relative">
+    <div class="absolute inset-0 bg-blueprint-fine pointer-events-none"></div>
 
+    <!-- Hero Section -->
+    <section ref="sectionRef" class="services-hero py-20 lg:py-32 relative overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div class="text-center max-w-4xl mx-auto">
           <div class="inline-block mb-6">
-            <span class="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-sm font-semibold">
+            <span class="px-4 py-2 bg-mintreu-red-100 dark:bg-mintreu-red-900/30 text-mintreu-red-700 dark:text-mintreu-red-400 rounded-full text-sm font-heading font-bold uppercase tracking-wider">
               Services
             </span>
           </div>
-          <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-8 text-gray-900 dark:text-white leading-tight">
-            Premium <span class="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">Development</span> Services
+          <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-black mb-8 text-titanium-900 dark:text-white leading-tight">
+            Premium <span class="text-mintreu-red-600">Development</span> Services
           </h1>
-          <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-400 leading-relaxed max-w-3xl mx-auto">
+          <p class="text-xl md:text-2xl text-titanium-600 dark:text-titanium-400 leading-relaxed max-w-3xl mx-auto font-subheading">
             From concept to deployment, we deliver end-to-end software solutions tailored to your unique needs.
           </p>
+          <div class="line-technical mt-8 mx-auto max-w-md"></div>
         </div>
       </div>
     </section>
 
     <!-- Services Grid -->
-    <section class="py-20 bg-gray-50 dark:bg-gray-900">
+    <section class="services-grid py-20 bg-white dark:bg-titanium-900 relative">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <!-- Web Development -->
-          <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2">
-            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6">
-              <Icon name="lucide:globe" class="w-8 h-8 text-white" />
+          <div v-for="service in services" :key="service.title" class="service-card bg-titanium-50 dark:bg-titanium-800 rounded-3xl p-8 border border-dashed border-titanium-300 dark:border-titanium-700 hover:border-mintreu-red-600/50 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-mintreu-red-600/40 rounded-tl-xl"></div>
+            <div class="w-16 h-16 bg-mintreu-red-600 rounded-2xl flex items-center justify-center mb-6">
+              <Icon :name="service.icon" class="w-8 h-8 text-white" />
             </div>
-            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Web Development</h3>
-            <p class="text-gray-600 dark:text-gray-400 mb-6">
-              Custom web applications built with modern frameworks like Laravel, Nuxt, and React. Scalable, secure, and performant.
-            </p>
+            <h3 class="text-2xl font-heading font-bold mb-4 text-titanium-900 dark:text-white">{{ service.title }}</h3>
+            <p class="text-titanium-600 dark:text-titanium-400 mb-6 font-subheading leading-relaxed">{{ service.description }}</p>
             <ul class="space-y-2">
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-blue-500" />
-                <span>Custom Web Applications</span>
-              </li>
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-blue-500" />
-                <span>SPA & SSR Solutions</span>
-              </li>
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-blue-500" />
-                <span>API Development</span>
-              </li>
-            </ul>
-          </div>
-
-          <!-- Mobile Apps -->
-          <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2">
-            <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6">
-              <Icon name="lucide:smartphone" class="w-8 h-8 text-white" />
-            </div>
-            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Mobile Development</h3>
-            <p class="text-gray-600 dark:text-gray-400 mb-6">
-              Native and cross-platform mobile applications for iOS and Android. Beautiful UI with native performance.
-            </p>
-            <ul class="space-y-2">
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-purple-500" />
-                <span>iOS & Android Apps</span>
-              </li>
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-purple-500" />
-                <span>Cross-Platform (React Native)</span>
-              </li>
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-purple-500" />
-                <span>App Store Optimization</span>
-              </li>
-            </ul>
-          </div>
-
-          <!-- SaaS Products -->
-          <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2">
-            <div class="w-16 h-16 bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6">
-              <Icon name="lucide:cloud" class="w-8 h-8 text-white" />
-            </div>
-            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">SaaS Development</h3>
-            <p class="text-gray-600 dark:text-gray-400 mb-6">
-              Build recurring revenue with subscription-based software products. From MVP to enterprise scale.
-            </p>
-            <ul class="space-y-2">
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-pink-500" />
-                <span>SaaS MVP Development</span>
-              </li>
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-pink-500" />
-                <span>Subscription Management</span>
-              </li>
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-pink-500" />
-                <span>Multi-tenant Architecture</span>
-              </li>
-            </ul>
-          </div>
-
-          <!-- API Development -->
-          <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2">
-            <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mb-6">
-              <Icon name="lucide:server" class="w-8 h-8 text-white" />
-            </div>
-            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">API Development</h3>
-            <p class="text-gray-600 dark:text-gray-400 mb-6">
-              Robust, scalable APIs designed for performance and security. RESTful and GraphQL implementations.
-            </p>
-            <ul class="space-y-2">
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-green-500" />
-                <span>RESTful API Design</span>
-              </li>
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-green-500" />
-                <span>GraphQL APIs</span>
-              </li>
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-green-500" />
-                <span>API Documentation</span>
-              </li>
-            </ul>
-          </div>
-
-          <!-- E-Commerce -->
-          <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2">
-            <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mb-6">
-              <Icon name="lucide:shopping-cart" class="w-8 h-8 text-white" />
-            </div>
-            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">E-Commerce</h3>
-            <p class="text-gray-600 dark:text-gray-400 mb-6">
-              Complete e-commerce solutions with payment integration, inventory management, and analytics.
-            </p>
-            <ul class="space-y-2">
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-orange-500" />
-                <span>Custom Store Development</span>
-              </li>
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-orange-500" />
-                <span>Payment Integration</span>
-              </li>
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-orange-500" />
-                <span>Inventory Systems</span>
-              </li>
-            </ul>
-          </div>
-
-          <!-- Consulting -->
-          <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2">
-            <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center mb-6">
-              <Icon name="lucide:lightbulb" class="w-8 h-8 text-white" />
-            </div>
-            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Tech Consulting</h3>
-            <p class="text-gray-600 dark:text-gray-400 mb-6">
-              Strategic technology consulting to help you make informed decisions about your digital products.
-            </p>
-            <ul class="space-y-2">
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-red-500" />
-                <span>Architecture Planning</span>
-              </li>
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-red-500" />
-                <span>Technology Selection</span>
-              </li>
-              <li class="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-                <Icon name="lucide:check" class="w-5 h-5 text-red-500" />
-                <span>Code Review & Audit</span>
+              <li v-for="feature in service.features" :key="feature" class="flex items-center space-x-2 text-titanium-700 dark:text-titanium-300 font-subheading">
+                <Icon name="lucide:check" class="w-5 h-5 text-mintreu-red-600 flex-shrink-0" />
+                <span>{{ feature }}</span>
               </li>
             </ul>
           </div>
@@ -179,140 +45,173 @@
     </section>
 
     <!-- Process -->
-    <section class="py-20">
+    <section class="services-process py-20 bg-titanium-50 dark:bg-titanium-950 relative">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
           <div class="inline-block mb-4">
-            <span class="px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded-full text-sm font-semibold">
+            <span class="px-4 py-2 bg-mintreu-red-100 dark:bg-mintreu-red-900/30 text-mintreu-red-700 dark:text-mintreu-red-400 rounded-full text-sm font-heading font-bold uppercase tracking-wider">
               Process
             </span>
           </div>
-          <h2 class="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
-            How We <span class="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">Work</span>
+          <h2 class="text-4xl md:text-5xl font-heading font-black text-titanium-900 dark:text-white">
+            How We <span class="text-mintreu-red-600">Work</span>
           </h2>
         </div>
 
         <div class="grid md:grid-cols-4 gap-8">
-          <div v-for="(step, index) in process" :key="step.title" class="text-center">
-            <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">
-              {{ index + 1 }}
+          <div v-for="(step, index) in process" :key="step.title" class="process-step text-center">
+            <div class="w-20 h-20 bg-titanium-900 border-2 border-dashed border-mintreu-red-600/50 rounded-full flex items-center justify-center mx-auto mb-6 relative">
+              <span class="text-2xl font-heading font-black text-mintreu-red-500">{{ index + 1 }}</span>
             </div>
-            <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">{{ step.title }}</h3>
-            <p class="text-gray-600 dark:text-gray-400">{{ step.description }}</p>
+            <h3 class="text-xl font-heading font-bold mb-3 text-titanium-900 dark:text-white">{{ step.title }}</h3>
+            <p class="text-titanium-600 dark:text-titanium-400 font-subheading leading-relaxed">{{ step.description }}</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Pricing -->
-    <section class="py-20 bg-gray-50 dark:bg-gray-900">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
+    <!-- Money-Back Guarantee -->
+    <section class="services-guarantee relative overflow-hidden">
+      <div class="absolute inset-0 bg-titanium-900"></div>
+      <div class="absolute inset-0 bg-blueprint opacity-20 pointer-events-none"></div>
+      <div class="relative py-16 border-y border-dashed border-titanium-700">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex flex-col md:flex-row items-center gap-8">
+            <div class="w-24 h-24 bg-mintreu-red-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+              <Icon name="lucide:shield-check" class="w-12 h-12 text-white" />
+            </div>
+            <div>
+              <h3 class="text-3xl font-heading font-black text-white mb-2">30-Day Money-Back Guarantee</h3>
+              <p class="text-titanium-400 font-subheading text-lg leading-relaxed">
+                We stand behind every product and service we deliver. If you're not 100% satisfied, get a full refund within 30 days — no questions asked. This applies to all our products, flat and simple.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quote CTA (replaces old pricing section) -->
+    <section class="services-quote py-20 bg-white dark:bg-titanium-900 relative">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
           <div class="inline-block mb-4">
-            <span class="px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-sm font-semibold">
+            <span class="px-4 py-2 bg-mintreu-red-100 dark:bg-mintreu-red-900/30 text-mintreu-red-700 dark:text-mintreu-red-400 rounded-full text-sm font-heading font-bold uppercase tracking-wider">
               Pricing
             </span>
           </div>
-          <h2 class="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
-            Simple, Transparent <span class="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">Pricing</span>
+          <h2 class="text-4xl md:text-5xl font-heading font-black text-titanium-900 dark:text-white">
+            Custom <span class="text-mintreu-red-600">Quotes</span> for Every Project
           </h2>
+          <p class="text-lg text-titanium-600 dark:text-titanium-400 max-w-2xl mx-auto mt-6 font-subheading leading-relaxed">
+            Every project is unique. We provide transparent, custom quotes based on your specific requirements — no hidden fees, no surprises.
+          </p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          <!-- Hourly -->
-          <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl">
-            <h3 class="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Hourly Rate</h3>
-            <div class="text-4xl font-black text-blue-600 mb-6">$75<span class="text-lg text-gray-500 font-normal">/hr</span></div>
-            <p class="text-gray-600 dark:text-gray-400 mb-6">Perfect for ongoing projects and maintenance.</p>
-            <ul class="space-y-3 mb-8">
-              <li class="flex items-center space-x-2">
-                <Icon name="lucide:check" class="w-5 h-5 text-green-500" />
-                <span class="text-gray-700 dark:text-gray-300">Flexible engagement</span>
-              </li>
-              <li class="flex items-center space-x-2">
-                <Icon name="lucide:check" class="w-5 h-5 text-green-500" />
-                <span class="text-gray-700 dark:text-gray-300">Quick turnaround</span>
-              </li>
-              <li class="flex items-center space-x-2">
-                <Icon name="lucide:check" class="w-5 h-5 text-green-500" />
-                <span class="text-gray-700 dark:text-gray-300">No long-term commitment</span>
-              </li>
-            </ul>
-          </div>
-
-          <!-- Project -->
-          <div class="bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl p-8 shadow-2xl transform scale-105">
-            <div class="text-white">
-              <h3 class="text-2xl font-bold mb-2">Fixed Project</h3>
-              <div class="text-4xl font-black mb-6">Custom</div>
-              <p class="text-white/90 mb-6">Best for well-defined projects with clear requirements.</p>
-              <ul class="space-y-3 mb-8">
-                <li class="flex items-center space-x-2">
-                  <Icon name="lucide:check" class="w-5 h-5 text-white" />
-                  <span>Fixed timeline & budget</span>
-                </li>
-                <li class="flex items-center space-x-2">
-                  <Icon name="lucide:check" class="w-5 h-5 text-white" />
-                  <span>Detailed proposal</span>
-                </li>
-                <li class="flex items-center space-x-2">
-                  <Icon name="lucide:check" class="w-5 h-5 text-white" />
-                  <span>Regular updates</span>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div v-for="plan in plans" :key="plan.title" class="quote-card bg-titanium-50 dark:bg-titanium-800 rounded-3xl p-8 border border-dashed border-titanium-300 dark:border-titanium-700 hover:border-mintreu-red-600/50 transition-all duration-300 relative overflow-hidden text-center">
+            <div class="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-mintreu-red-600/40 rounded-tl-xl"></div>
+            <div class="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-mintreu-red-600/40 rounded-br-xl"></div>
+            <div class="relative">
+              <Icon :name="plan.icon" class="w-12 h-12 text-mintreu-red-600 mx-auto mb-4" />
+              <h3 class="text-2xl font-heading font-bold mb-2 text-titanium-900 dark:text-white">{{ plan.title }}</h3>
+              <p class="text-titanium-600 dark:text-titanium-400 mb-6 font-subheading">{{ plan.description }}</p>
+              <ul class="space-y-3 mb-8 text-left">
+                <li v-for="feature in plan.features" :key="feature" class="flex items-center space-x-2">
+                  <Icon name="lucide:check" class="w-5 h-5 text-mintreu-red-600 flex-shrink-0" />
+                  <span class="text-titanium-700 dark:text-titanium-300 font-subheading">{{ feature }}</span>
                 </li>
               </ul>
+              <NuxtLink to="/contact" class="inline-block w-full px-6 py-3 bg-mintreu-red-600 hover:bg-mintreu-red-700 text-white font-heading font-bold rounded-xl shadow-lg glow-red transform hover:scale-105 active:scale-95 transition-all">
+                Request Quote
+              </NuxtLink>
             </div>
-          </div>
-
-          <!-- Retainer -->
-          <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl">
-            <h3 class="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Monthly Retainer</h3>
-            <div class="text-4xl font-black text-purple-600 mb-6">$2,500+<span class="text-lg text-gray-500 font-normal">/mo</span></div>
-            <p class="text-gray-600 dark:text-gray-400 mb-6">Dedicated team for ongoing development needs.</p>
-            <ul class="space-y-3 mb-8">
-              <li class="flex items-center space-x-2">
-                <Icon name="lucide:check" class="w-5 h-5 text-green-500" />
-                <span class="text-gray-700 dark:text-gray-300">Dedicated hours</span>
-              </li>
-              <li class="flex items-center space-x-2">
-                <Icon name="lucide:check" class="w-5 h-5 text-green-500" />
-                <span class="text-gray-700 dark:text-gray-300">Priority support</span>
-              </li>
-              <li class="flex items-center space-x-2">
-                <Icon name="lucide:check" class="w-5 h-5 text-green-500" />
-                <span class="text-gray-700 dark:text-gray-300">Flexible rollover</span>
-              </li>
-            </ul>
           </div>
         </div>
       </div>
     </section>
 
     <!-- CTA -->
-    <section class="py-20">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-4xl md:text-5xl font-black mb-6 text-gray-900 dark:text-white">
-          Ready to Start Your <span class="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">Project?</span>
-        </h2>
-        <p class="text-xl text-gray-600 dark:text-gray-400 mb-10">
-          Let's discuss your project and find the perfect solution for your needs.
-        </p>
-        <NuxtLink
+    <section class="services-cta relative overflow-hidden">
+      <div class="absolute inset-0 bg-titanium-900"></div>
+      <div class="absolute inset-0 bg-blueprint opacity-20 pointer-events-none"></div>
+      <div class="relative py-20 border-t border-dashed border-titanium-700">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div class="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-mintreu-red-600 rounded-tl-xl"></div>
+          <div class="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-mintreu-red-600 rounded-br-xl"></div>
+
+          <h2 class="text-4xl md:text-5xl font-heading font-black mb-6 text-white">
+            Ready to Start Your <span class="text-mintreu-red-500">Project?</span>
+          </h2>
+          <p class="text-xl text-titanium-400 mb-10 font-subheading">
+            Let's discuss your project and find the perfect solution for your needs.
+          </p>
+          <NuxtLink
             to="/contact"
-            class="inline-flex items-center space-x-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-        >
-          <span>Get Free Consultation</span>
-          <Icon name="lucide:arrow-right" class="w-5 h-5" />
-        </NuxtLink>
+            class="inline-flex items-center space-x-2 px-8 py-4 bg-mintreu-red-600 hover:bg-mintreu-red-700 text-white font-heading font-bold rounded-xl shadow-lg glow-red hover:shadow-xl transform hover:scale-105 transition-all"
+          >
+            <span>Get Free Consultation</span>
+            <Icon name="lucide:arrow-right" class="w-5 h-5" />
+          </NuxtLink>
+        </div>
       </div>
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+gsap.registerPlugin(ScrollTrigger)
+
 useSeoMeta({
   title: 'Services | Mintreu - Premium Development Services',
   description: 'Explore our premium development services including web development, mobile apps, SaaS products, and API development.'
 })
+
+const sectionRef = ref<HTMLElement | null>(null)
+let ctx: gsap.Context | null = null
+
+const services = [
+  {
+    icon: 'lucide:globe',
+    title: 'Web Development',
+    description: 'Custom web applications built with modern frameworks like Laravel, Nuxt, and React. Scalable, secure, and performant.',
+    features: ['Custom Web Applications', 'SPA & SSR Solutions', 'API Development']
+  },
+  {
+    icon: 'lucide:smartphone',
+    title: 'Mobile Development',
+    description: 'Native and cross-platform mobile applications for iOS and Android. Beautiful UI with native performance.',
+    features: ['iOS & Android Apps', 'Cross-Platform (React Native)', 'App Store Optimization']
+  },
+  {
+    icon: 'lucide:cloud',
+    title: 'SaaS Development',
+    description: 'Build recurring revenue with subscription-based software products. From MVP to enterprise scale.',
+    features: ['SaaS MVP Development', 'Subscription Management', 'Multi-tenant Architecture']
+  },
+  {
+    icon: 'lucide:server',
+    title: 'API Development',
+    description: 'Robust, scalable APIs designed for performance and security. RESTful and GraphQL implementations.',
+    features: ['RESTful API Design', 'GraphQL APIs', 'API Documentation']
+  },
+  {
+    icon: 'lucide:shopping-cart',
+    title: 'E-Commerce',
+    description: 'Complete e-commerce solutions with payment integration, inventory management, and analytics.',
+    features: ['Custom Store Development', 'Payment Integration', 'Inventory Systems']
+  },
+  {
+    icon: 'lucide:lightbulb',
+    title: 'Tech Consulting',
+    description: 'Strategic technology consulting to help you make informed decisions about your digital products.',
+    features: ['Architecture Planning', 'Technology Selection', 'Code Review & Audit']
+  }
+]
 
 const process = [
   {
@@ -332,4 +231,71 @@ const process = [
     description: 'We deploy your project and provide ongoing support to ensure success.'
   }
 ]
+
+const plans = [
+  {
+    icon: 'lucide:zap',
+    title: 'Starter',
+    description: 'For small projects and MVPs',
+    features: ['Single feature scope', 'Quick turnaround', 'No long-term commitment', '30-day money-back guarantee']
+  },
+  {
+    icon: 'lucide:rocket',
+    title: 'Growth',
+    description: 'For well-defined projects',
+    features: ['Fixed timeline & budget', 'Detailed proposal', 'Regular updates', 'Dedicated project manager', '30-day money-back guarantee']
+  },
+  {
+    icon: 'lucide:building',
+    title: 'Enterprise',
+    description: 'For ongoing development needs',
+    features: ['Dedicated team hours', 'Priority support', 'Flexible rollover', 'Architecture consulting', '30-day money-back guarantee']
+  }
+]
+
+const initAnimations = () => {
+  ctx?.revert()
+  if (!sectionRef.value) return
+  ctx = gsap.context(() => {
+    gsap.from('.services-hero', { y: 40, opacity: 0, duration: 0.8, ease: 'power3.out' })
+
+    const sections = ['.services-grid', '.services-process', '.services-guarantee', '.services-quote', '.services-cta']
+    sections.forEach((sel) => {
+      gsap.from(sel, {
+        y: 40, opacity: 0, duration: 0.8, ease: 'power3.out',
+        scrollTrigger: { trigger: sel, start: 'top 85%' }
+      })
+    })
+
+    const serviceCards = gsap.utils.toArray('.service-card') as HTMLElement[]
+    serviceCards.forEach((card, i) => {
+      gsap.from(card, {
+        y: 50, opacity: 0, scale: 0.95, duration: 0.7, delay: i * 0.08,
+        ease: 'back.out(1.3)',
+        scrollTrigger: { trigger: card, start: 'top 90%' }
+      })
+    })
+
+    const processSteps = gsap.utils.toArray('.process-step') as HTMLElement[]
+    processSteps.forEach((step, i) => {
+      gsap.from(step, {
+        y: 30, opacity: 0, duration: 0.6, delay: i * 0.15,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: step, start: 'top 90%' }
+      })
+    })
+
+    const quoteCards = gsap.utils.toArray('.quote-card') as HTMLElement[]
+    quoteCards.forEach((card, i) => {
+      gsap.from(card, {
+        y: 40, opacity: 0, scale: 0.95, duration: 0.7, delay: i * 0.1,
+        ease: 'back.out(1.3)',
+        scrollTrigger: { trigger: card, start: 'top 90%' }
+      })
+    })
+  }, sectionRef.value)
+}
+
+onMounted(() => { initAnimations() })
+onUnmounted(() => { ctx?.revert() })
 </script>

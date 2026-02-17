@@ -3,11 +3,182 @@
 @tailwind utilities;
 
 @layer base {
-    html {
-        @apply scroll-smooth;
-    }
+  html {
+    @apply scroll-smooth;
+  }
 
-    body {
-        @apply antialiased;
-    }
+  body {
+    @apply antialiased font-body;
+  }
+}
+
+@layer components {
+  /* Blueprint Grid Background - thin gray lines */
+  .bg-blueprint {
+    background-image:
+      linear-gradient(rgba(168, 169, 173, 0.08) 0.5px, transparent 0.5px),
+      linear-gradient(90deg, rgba(168, 169, 173, 0.08) 0.5px, transparent 0.5px);
+    background-size: 40px 40px;
+  }
+
+  :is(.dark) .bg-blueprint {
+    background-image:
+      linear-gradient(rgba(168, 169, 173, 0.1) 0.5px, transparent 0.5px),
+      linear-gradient(90deg, rgba(168, 169, 173, 0.1) 0.5px, transparent 0.5px);
+    background-size: 40px 40px;
+  }
+
+  /* Blueprint Grid - Fine - thin gray lines */
+  .bg-blueprint-fine {
+    background-image:
+      linear-gradient(rgba(168, 169, 173, 0.06) 0.5px, transparent 0.5px),
+      linear-gradient(90deg, rgba(168, 169, 173, 0.06) 0.5px, transparent 0.5px);
+    background-size: 20px 20px;
+  }
+
+  :is(.dark) .bg-blueprint-fine {
+    background-image:
+      linear-gradient(rgba(168, 169, 173, 0.08) 0.5px, transparent 0.5px),
+      linear-gradient(90deg, rgba(168, 169, 173, 0.08) 0.5px, transparent 0.5px);
+    background-size: 20px 20px;
+  }
+
+  /* Industrial Red Glow */
+  .glow-red {
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.3), 0 0 60px rgba(220, 38, 38, 0.1);
+  }
+
+  .glow-red-intense {
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.5), 0 0 80px rgba(220, 38, 38, 0.2);
+  }
+
+  /* Metallic Text Gradient */
+  .text-metallic {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(to bottom, #dee2e6, #C0C0C0, #868e96);
+  }
+
+  /* Wireframe Border */
+  .border-wireframe {
+    @apply border border-dashed;
+    border-color: rgba(168, 169, 173, 0.3);
+  }
+
+  /* Technical Drawing Line */
+  .line-technical {
+    background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.6), transparent);
+    height: 1px;
+  }
+
+  /* Schematic label style */
+  .label-schematic {
+    @apply font-heading text-xs uppercase tracking-[0.2em];
+    color: #A8A9AD;
+  }
+
+  /* Industrial card base */
+  .card-industrial {
+    @apply relative bg-titanium-50 dark:bg-titanium-900/60 backdrop-blur-xl rounded-2xl border border-titanium-200 dark:border-titanium-800/50;
+    @apply hover:border-mintreu-red-600/50 transition-all duration-500;
+  }
+
+  /* Blueprint corner marks */
+  .corner-marks::before,
+  .corner-marks::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: rgba(220, 38, 38, 0.4);
+  }
+
+  .corner-marks::before {
+    top: -1px;
+    left: -1px;
+    border-top: 2px solid;
+    border-left: 2px solid;
+    border-color: inherit;
+  }
+
+  .corner-marks::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 2px solid;
+    border-right: 2px solid;
+    border-color: inherit;
+  }
+
+  /* Shimmer sweep effect */
+  .shimmer-sweep {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shimmer-sweep::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  /* Pulsing ring for badges */
+  .pulse-ring {
+    position: relative;
+  }
+
+  .pulse-ring::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: inherit;
+    border: 1px solid rgba(220, 38, 38, 0.4);
+    animation: pulse-ring-anim 2s ease-out infinite;
+  }
+
+  /* Perspective container for 3D card effects */
+  .perspective-container {
+    perspective: 1000px;
+  }
+}
+
+@layer utilities {
+  /* Custom scrollbar for industrial theme */
+  .scrollbar-industrial::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .scrollbar-industrial::-webkit-scrollbar-track {
+    background: #2D3436;
+  }
+
+  .scrollbar-industrial::-webkit-scrollbar-thumb {
+    background: #DC2626;
+    border-radius: 9999px;
+  }
+
+  /* Gradient text utility */
+  .text-gradient-red {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #DC2626, #f87171);
+  }
+
+  /* Marquee pause on hover */
+  .marquee-hover-pause:hover .animate-marquee,
+  .marquee-hover-pause:hover .animate-marquee-reverse {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  50%, 100% { left: 100%; }
+}
+
+@keyframes pulse-ring-anim {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.15); }
 }

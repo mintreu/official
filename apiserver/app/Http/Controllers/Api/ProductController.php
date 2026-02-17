@@ -63,7 +63,8 @@ class ProductController extends Controller
             $query->orderByDesc('price');
         }
 
-        $query->with('categories');\n        $paginator = $query->paginate($perPage);
+        $query->with(['categories', 'engagement']);
+        $paginator = $query->paginate($perPage);
         $paginator->getCollection()->transform(function ($item) {
             return (new ProductResource($item))->toArray(request());
         });
@@ -76,6 +77,7 @@ class ProductController extends Controller
         $product = Product::where('slug', $slug)
             ->with(['plans' => fn ($q) => $q->active()->ordered()])
             ->with(['sources' => fn ($q) => $q->active()->ordered()])
+            ->with('engagement')
             ->firstOrFail();
 
         // Get related products (same category, excluding current)

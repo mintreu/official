@@ -29,8 +29,6 @@ class ProductsTable
                     ->searchable(),
                 TextColumn::make('type')
                     ->searchable(),
-                TextColumn::make('download_url')
-                    ->searchable(),
                 TextColumn::make('demo_url')
                     ->searchable(),
                 TextColumn::make('github_url')
@@ -49,12 +47,12 @@ class ProductsTable
                     ->searchable(),
                 IconColumn::make('featured')
                     ->boolean(),
-                IconColumn::make('is_payable')
+                IconColumn::make('requires_auth')
                     ->boolean(),
-                IconColumn::make('requires_account')
-                    ->boolean(),
-                TextColumn::make('default_license_type')
+                TextColumn::make('default_license')
                     ->searchable(),
+                TextColumn::make('short_description')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

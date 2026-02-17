@@ -1,0 +1,85 @@
+RULE 1:
+- STATUS: Partial
+- EVIDENCE:
+  - ProductType enum defines API products: apiserver/app/Enums/ProductType.php (ApiService, ApiReferral)
+  - Product::isApiProduct uses ProductType check: apiserver/app/Models/Product.php
+  - Plans are generic and not guarded by product type: apiserver/app/Models/Products/Plan.php
+- RISKS:
+  - Non-API products can be assigned plans, causing wrong billing logic and UI confusion.
+- RECOMMENDED CHANGE (minimal):
+  - Add a guard when creating/updating a Plan to ensure product->type is ApiService/ApiReferral (model booted saving hook or Filament form validation).
+
+RULE 2:
+- STATUS: Partial / Missing
+- EVIDENCE:
+  - ApiKey has only single domain_restriction string + ip_whitelist json: apiserver/app/Models/Api/ApiKey.php
+  - Plan limits JSON exists: apiserver/app/Models/Products/Plan.php (limits json)
+  - No DEV vs PROD key enforcement logic found in middleware or models.
+- RISKS:
+  - Cannot support multiple domains per key.
+  - No formal DEV vs PROD policy; risk of prod keys used on localhost.
+- RECOMMENDED CHANGE (minimal):
+  - Store allowed domains as JSON string inside domain_restriction (no new column) and parse in middleware.
+  - Use key_prefix convention (e.g., sk_test vs sk_live) to enforce DEV vs PROD domain rules.
+  - Use Plan.limits['domains'] to cap number of domains (validate on update).
+
+RULE 3:
+- STATUS: Partial
+- EVIDENCE:
+  - ApiKeyRateLimit middleware resolves domain from Origin/Referer, then Host fallback: apiserver/app/Http/Middleware/ApiKeyRateLimit.php
+- RISKS:
+  - Some non-API routes may still rely on Host; ensure all API product endpoints are gated through this middleware.
+- RECOMMENDED CHANGE (minimal):
+  - Ensure all API product routes are grouped under api.key middleware.
+  - Keep Origin/Referer as primary domain source (already done).
+
+RULE 4:
+- STATUS: Partial
+- EVIDENCE:
+  - Plan limits exist: requests_per_minute/day/month in apiserver/app/Models/Products/Plan.php
+  - ApiKey::isWithinLimits uses daily/monthly counters: apiserver/app/Models/Api/ApiKey.php
+  - Middleware enforces per-minute with RateLimiter: apiserver/app/Http/Middleware/ApiKeyRateLimit.php
+  - No scheduler/cron found to reset daily/monthly counters.
+- RISKS:
+  - Daily/monthly counters will never reset without scheduler job.
+- RECOMMENDED CHANGE (minimal):
+  - Add scheduled tasks to reset daily/monthly counters (ApiKey::resetDailyCounters / resetMonthlyCounters).
+  - Ensure server cron runs Laravel scheduler.
+
+RULE 5:
+- STATUS: Partial
+- EVIDENCE:
+  - CORS allowlist is static and not '*': apiserver/config/cors.php
+  - supports_credentials is true.
+- RISKS:
+  - Not safe for customer-hosted Nuxt unless allowlist is dynamic per customer/space.
+  - supports_credentials true is unnecessary for bearer-token APIs and can encourage cookie-based auth.
+- RECOMMENDED CHANGE (minimal):
+  - Keep static allowlist for now, but add a plan to make it dynamic per customer/space.
+  - Consider setting supports_credentials to false for token-only APIs.
+
+OBJECTIONS:
+- The current schema lacks a proper multi-domain list per key. Using a single string is too limiting and fragile.
+- There is no DEV/PROD key separation in behavior; prefix-only is implicit and not enforced.
+
+ALTERNATIVE DESIGN:
+- Store allowed domains as JSON in ApiKey.domain_restriction (string column storing JSON array). This avoids migrations and enables multiple domains.
+- Use key_prefix to enforce dev/prod rules and default domain allowances (e.g., sk_test allows localhost + staging, sk_live requires explicit domains).
+- Keep plan limits in Plan.limits (JSON) for domains, use validation in middleware + admin UI.
+
+P0.5 PLAN (steps + files):
+1) Gate all API product routes behind api.key middleware (routes/api.php).
+2) Add scheduler tasks for daily/monthly counter reset (routes/console.php or app/Console/Kernel.php).
+3) Enforce plan API-only in Plan creation (model hook or Filament Plan form if exists).
+4) Implement domain list parsing in ApiKeyRateLimit using domain_restriction JSON string.
+
+P1 PLAN (steps + files):
+1) Add admin UI for managing allowed domains per key (Filament ApiKey resource if exists).
+2) Add dev/prod key enforcement logic with plan-specific limits.
+3) Add dynamic CORS allowlist backed by per-customer settings.
+4) Add explicit space scoping to keys (without new tables if possible, using meta/limits JSON).
+
+Repo-level insight:
+- Per-API-product plan ladder is preferred (plans are already tied to product_id). Global plans would break product-specific rate caps.
+- DEV keys: use key_prefix and lower limits (requests_per_minute/day) via a dedicated dev plan or Plan.limits flags.
+- Domain limit: enforce Plan.limits['domains'] by counting configured domains; reject updates beyond limit.

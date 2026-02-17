@@ -7,6 +7,7 @@ use App\Enums\LicenseType;
 use App\Enums\ProductType;
 use App\Enums\SourceProvider;
 use App\Models\Product;
+use App\Models\Products\ProductEngagement;
 use App\Models\Products\ProductSource;
 use Illuminate\Database\Seeder;
 
@@ -256,6 +257,15 @@ class ProductSeeder extends Seeder
                     'metadata' => [],
                     'is_primary' => true,
                     'is_active' => true,
+                ]
+            );
+
+            ProductEngagement::updateOrCreate(
+                ['product_id' => $product->id],
+                [
+                    'downloads' => $productData['downloads'] ?? 0,
+                    'rating' => $productData['rating'] ?? 0,
+                    'version' => $productData['version'] ?? $product->version,
                 ]
             );
         }

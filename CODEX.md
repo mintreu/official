@@ -177,6 +177,14 @@ See: .codex/todo.md
 
 ---
 
+## Sanctum data loading reminder
+
+- `/api/user` should be overridden to return a lean `UserIndexResource` enriched with verification, affiliate, and membership info so `useSanctum()` gives the app everything it needs immediately.
+- Reserve `/api/user/profile` for deep views that actually need addresses, KYC, wallet, or subscription relations.
+- All other frontend fetching must go through `useSanctumFetch` (directly or via `useApi()` wrappers) with manual refs/watchers; Nuxt’s `useAsyncData` / `useFetch` are no longer used in this project.
+
+---
+
 ## Persona Layer (conversation wrapper only)
 
 This project uses a single unified conversational persona called AI Devi.

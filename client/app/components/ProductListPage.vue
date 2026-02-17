@@ -1,58 +1,59 @@
 <template>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Header -->
-    <div class="text-center mb-16">
+    <div ref="sectionRef" class="product-header text-center mb-16">
       <div class="inline-block mb-4">
-        <span class="px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-sm font-semibold">
+        <span class="px-4 py-2 bg-mintreu-red-100 dark:bg-mintreu-red-900/30 text-mintreu-red-700 dark:text-mintreu-red-400 rounded-full text-sm font-heading font-bold uppercase tracking-wider">
           {{ productType === 'api' ? 'APIs' : productType === 'template' ? 'Templates' : productType === 'freebie' ? 'Free' : 'Premium Solutions' }}
         </span>
       </div>
-      <h1 class="text-4xl sm:text-5xl md:text-6xl font-black mb-6 text-gray-900 dark:text-white">
+      <h1 class="text-4xl sm:text-5xl md:text-6xl font-heading font-black mb-6 text-titanium-900 dark:text-white">
         {{ title }}
       </h1>
-      <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+      <p class="text-lg text-titanium-600 dark:text-titanium-400 max-w-2xl mx-auto font-subheading">
         {{ subtitle }}
       </p>
+      <div class="line-technical mt-8 mx-auto max-w-md"></div>
     </div>
 
     <!-- Quick Nav Tabs -->
     <div class="flex flex-wrap gap-2 justify-center mb-8">
       <NuxtLink
-          to="/products"
-          class="px-4 py-2 rounded-lg font-semibold text-sm transition-all"
-          :class="!productType
-          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
-          : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'"
+        to="/products"
+        class="px-4 py-2 rounded-xl font-heading font-bold text-sm transition-all duration-300"
+        :class="!productType
+          ? 'bg-mintreu-red-600 text-white shadow-lg glow-red'
+          : 'bg-white dark:bg-titanium-900 text-titanium-700 dark:text-titanium-300 border border-dashed border-titanium-300 dark:border-titanium-700 hover:border-mintreu-red-600/50'"
       >
         <Icon name="lucide:grid-3x3" class="w-4 h-4 inline mr-1" />
         All
       </NuxtLink>
       <NuxtLink
-          to="/products/apis"
-          class="px-4 py-2 rounded-lg font-semibold text-sm transition-all"
-          :class="productType === 'api'
-          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
-          : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'"
+        to="/products/apis"
+        class="px-4 py-2 rounded-xl font-heading font-bold text-sm transition-all duration-300"
+        :class="productType === 'api'
+          ? 'bg-mintreu-red-600 text-white shadow-lg glow-red'
+          : 'bg-white dark:bg-titanium-900 text-titanium-700 dark:text-titanium-300 border border-dashed border-titanium-300 dark:border-titanium-700 hover:border-mintreu-red-600/50'"
       >
         <Icon name="lucide:server" class="w-4 h-4 inline mr-1" />
         APIs
       </NuxtLink>
       <NuxtLink
-          to="/products/templates"
-          class="px-4 py-2 rounded-lg font-semibold text-sm transition-all"
-          :class="productType === 'template'
-          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
-          : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'"
+        to="/products/templates"
+        class="px-4 py-2 rounded-xl font-heading font-bold text-sm transition-all duration-300"
+        :class="productType === 'template'
+          ? 'bg-mintreu-red-600 text-white shadow-lg glow-red'
+          : 'bg-white dark:bg-titanium-900 text-titanium-700 dark:text-titanium-300 border border-dashed border-titanium-300 dark:border-titanium-700 hover:border-mintreu-red-600/50'"
       >
         <Icon name="lucide:layout" class="w-4 h-4 inline mr-1" />
         Templates
       </NuxtLink>
       <NuxtLink
-          to="/products/freebies"
-          class="px-4 py-2 rounded-lg font-semibold text-sm transition-all"
-          :class="productType === 'freebie'
-          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
-          : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'"
+        to="/products/freebies"
+        class="px-4 py-2 rounded-xl font-heading font-bold text-sm transition-all duration-300"
+        :class="productType === 'freebie'
+          ? 'bg-mintreu-red-600 text-white shadow-lg glow-red'
+          : 'bg-white dark:bg-titanium-900 text-titanium-700 dark:text-titanium-300 border border-dashed border-titanium-300 dark:border-titanium-700 hover:border-mintreu-red-600/50'"
       >
         <Icon name="lucide:gift" class="w-4 h-4 inline mr-1" />
         Free
@@ -62,30 +63,28 @@
     <!-- Filters & Search -->
     <div class="mb-12">
       <div class="flex flex-col lg:flex-row gap-4 items-center justify-between mb-6">
-        <!-- Search -->
         <div class="relative w-full lg:w-96">
-          <Icon name="lucide:search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Icon name="lucide:search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-titanium-400" />
           <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Search products..."
-              class="w-full pl-12 pr-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search products..."
+            class="w-full pl-12 pr-4 py-3 bg-white dark:bg-titanium-900 border border-titanium-300 dark:border-titanium-700 rounded-xl focus:ring-2 focus:ring-mintreu-red-500 focus:border-mintreu-red-500 font-subheading text-titanium-900 dark:text-white placeholder-titanium-400"
           />
         </div>
 
-        <!-- Category & Sort -->
         <div class="flex gap-3 w-full lg:w-auto">
           <select
-              v-model="activeCategory"
-              class="px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 flex-1 lg:flex-none"
+            v-model="activeCategory"
+            class="px-4 py-3 bg-white dark:bg-titanium-900 border border-titanium-300 dark:border-titanium-700 rounded-xl focus:ring-2 focus:ring-mintreu-red-500 font-subheading text-titanium-900 dark:text-white flex-1 lg:flex-none"
           >
             <option value="">All Categories</option>
             <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
           </select>
 
           <select
-              v-model="sortBy"
-              class="px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 flex-1 lg:flex-none"
+            v-model="sortBy"
+            class="px-4 py-3 bg-white dark:bg-titanium-900 border border-titanium-300 dark:border-titanium-700 rounded-xl focus:ring-2 focus:ring-mintreu-red-500 font-subheading text-titanium-900 dark:text-white flex-1 lg:flex-none"
           >
             <option value="latest">Latest First</option>
             <option value="popular">Most Popular</option>
@@ -98,59 +97,57 @@
       <!-- Category Pills -->
       <div class="flex flex-wrap gap-3">
         <button
-            v-for="category in ['All', ...categories]"
-            :key="category"
-            @click="activeCategory = category === 'All' ? '' : category"
-            class="px-6 py-2 rounded-lg font-semibold transition-all"
-            :class="(category === 'All' && !activeCategory) || activeCategory === category
-            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
-            : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'"
+          v-for="category in ['All', ...categories]"
+          :key="category"
+          @click="activeCategory = category === 'All' ? '' : category"
+          class="px-6 py-2 rounded-xl font-heading font-bold text-sm transition-all duration-300"
+          :class="(category === 'All' && !activeCategory) || activeCategory === category
+            ? 'bg-mintreu-red-600 text-white shadow-lg glow-red'
+            : 'bg-white dark:bg-titanium-900 text-titanium-700 dark:text-titanium-300 border border-dashed border-titanium-300 dark:border-titanium-700 hover:border-mintreu-red-600/50'"
         >
           {{ category }}
         </button>
       </div>
     </div>
 
-    <!-- Products Grid -->
+    <!-- Loading -->
     <div v-if="pending" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <div v-for="n in 6" :key="n" class="bg-white dark:bg-gray-900 rounded-3xl h-96 animate-pulse"></div>
+      <div v-for="n in 6" :key="n" class="bg-white dark:bg-titanium-900 rounded-3xl overflow-hidden border border-dashed border-titanium-300 dark:border-titanium-700 shadow-xl animate-pulse">
+        <div class="h-48 bg-titanium-200 dark:bg-titanium-800"></div>
+        <div class="p-6 space-y-3">
+          <div class="h-6 bg-titanium-200 dark:bg-titanium-800 rounded w-3/4"></div>
+          <div class="h-4 bg-titanium-200 dark:bg-titanium-800 rounded"></div>
+          <div class="h-10 bg-titanium-200 dark:bg-titanium-800 rounded w-1/2"></div>
+        </div>
+      </div>
     </div>
 
-    <div v-else-if="products?.data && products.data.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <!-- Products Grid -->
+    <div v-else-if="products?.data && products.data.length > 0" class="perspective-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       <NuxtLink
-          v-for="product in products.data"
-          :key="product.slug"
-          :to="`/products/${product.slug}`"
-          class="group relative bg-white dark:bg-gray-900 rounded-3xl overflow-hidden border border-gray-200 dark:border-gray-800 hover:border-transparent shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
+        v-for="product in products.data"
+        :key="product.slug"
+        :to="`/products/${product.slug}`"
+        class="product-card group relative bg-white dark:bg-titanium-900 rounded-3xl overflow-hidden border border-dashed border-titanium-300 dark:border-titanium-700 hover:border-mintreu-red-600/50 dark:hover:border-mintreu-red-600/50 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
       >
-        <!-- Gradient Border -->
-        <div class="absolute inset-0 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"></div>
-        <div class="absolute inset-[1px] bg-white dark:bg-gray-900 rounded-3xl"></div>
-
-        <div class="relative block">
+        <div class="relative">
           <!-- Product Image -->
-          <div class="relative h-48 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 flex items-center justify-center">
-            <img
-                v-if="product.image"
-                :src="product.image"
-                :alt="product.title"
-                class="w-full h-full object-cover"
-            />
-            <Icon v-else name="lucide:package" class="w-20 h-20 text-white/40" />
+          <div class="relative h-48 bg-titanium-800 flex items-center justify-center overflow-hidden">
+            <div class="absolute inset-0 bg-blueprint opacity-20 pointer-events-none"></div>
+            <img v-if="product.image" :src="product.image" :alt="product.title"
+              class="relative w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            <Icon v-else name="lucide:package" class="relative w-20 h-20 text-titanium-600 group-hover:text-mintreu-red-600/60 group-hover:scale-110 transition-all duration-500" />
 
             <!-- Type Badge -->
             <div class="absolute top-4 right-4">
-              <span
-                  class="px-3 py-1.5 backdrop-blur-xl border rounded-full text-xs font-bold"
-                  :class="getTypeBadgeClass(product.type)"
-              >
+              <span class="px-3 py-1.5 bg-titanium-900/60 backdrop-blur-sm border border-titanium-600 rounded-full text-white text-xs font-heading font-bold">
                 {{ getTypeLabel(product.type) }}
               </span>
             </div>
 
             <!-- Free Badge -->
             <div v-if="product.price === 0" class="absolute top-4 left-4">
-              <span class="px-3 py-1.5 bg-green-500 text-white rounded-full text-xs font-bold">
+              <span class="px-3 py-1.5 bg-green-600/80 backdrop-blur-sm border border-green-500/30 rounded-full text-white text-xs font-heading font-bold">
                 FREE
               </span>
             </div>
@@ -158,46 +155,40 @@
 
           <!-- Content -->
           <div class="p-6">
-            <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
+            <h3 class="text-xl font-heading font-bold mb-2 text-titanium-900 dark:text-white group-hover:text-mintreu-red-600 transition-colors line-clamp-1">
               {{ product.title }}
             </h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+            <p class="text-sm text-titanium-600 dark:text-titanium-400 mb-4 line-clamp-2 font-subheading leading-relaxed">
               {{ product.description }}
             </p>
 
             <!-- Price & Stats -->
-            <div class="pt-4 border-t border-gray-200 dark:border-gray-800">
+            <div class="pt-4 border-t border-titanium-200 dark:border-titanium-800">
               <div class="flex items-center justify-between mb-3">
-                <!-- Price -->
-                <div v-if="product.type === 'api'" class="text-lg font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  {{ currency === 'USD' ? `$${product.price}` : `₹${(product.price * 82).toFixed(0)}` }}<span class="text-xs">/mo</span>
-                </div>
-                <div v-else-if="product.price === 0" class="text-lg font-black text-green-600 dark:text-green-400">
+                <div v-if="product.price === 0" class="text-lg font-heading font-black text-green-600 dark:text-green-400">
                   FREE
                 </div>
-                <div v-else class="text-lg font-black text-gray-900 dark:text-white">
-                  {{ currency === 'USD' ? `$${product.price}` : `₹${(product.price * 82).toFixed(0)}` }}
+                <div v-else class="text-lg font-heading font-black text-titanium-900 dark:text-white">
+                  {{ formatPrice(product.price) }}
+                  <span v-if="product.type === 'api'" class="text-xs text-titanium-500 font-subheading">/mo</span>
                 </div>
 
-                <!-- Downloads/Rating -->
-                <div class="flex items-center space-x-3 text-xs text-gray-500">
+                <div class="flex items-center space-x-3 text-xs text-titanium-500 font-subheading">
                   <div v-if="product.downloads" class="flex items-center space-x-1">
                     <Icon name="lucide:download" class="w-4 h-4" />
                     <span>{{ product.downloads }}</span>
                   </div>
                   <div v-if="product.rating" class="flex items-center space-x-1">
-                    <Icon name="lucide:star" class="w-4 h-4 text-yellow-500" />
+                    <Icon name="lucide:star" class="w-4 h-4 text-amber-500" />
                     <span>{{ product.rating }}</span>
                   </div>
                 </div>
               </div>
 
-              <!-- View Details Button -->
               <button
-                  class="w-full px-4 py-2 rounded-lg font-bold text-sm shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-                  :class="getButtonClass(product.type)"
+                class="w-full px-4 py-2.5 bg-mintreu-red-600 hover:bg-mintreu-red-700 text-white rounded-xl font-heading font-bold text-sm shadow-lg transform hover:scale-105 active:scale-95 transition-all duration-300"
               >
-                {{ getButtonText(product.type) }}
+                {{ product.price === 0 ? 'Download Free' : product.type === 'api' ? 'Start Free Trial' : 'View Details' }}
               </button>
             </div>
           </div>
@@ -207,38 +198,38 @@
 
     <!-- Empty State -->
     <div v-else class="text-center py-20">
-      <Icon name="lucide:package-open" class="w-20 h-20 text-gray-300 dark:text-gray-700 mx-auto mb-4" />
-      <h3 class="text-xl font-bold mb-2">No Products Found</h3>
-      <p class="text-gray-600 dark:text-gray-400">Try adjusting your filters</p>
+      <Icon name="lucide:package-open" class="w-20 h-20 text-titanium-400 mx-auto mb-4" />
+      <h3 class="text-xl font-heading font-bold mb-2 text-titanium-900 dark:text-white">No Products Found</h3>
+      <p class="text-titanium-600 dark:text-titanium-400 font-subheading">Try adjusting your filters</p>
     </div>
 
     <!-- Pagination -->
     <div v-if="products && products.meta && products.meta.last_page > 1" class="mt-12 flex justify-center">
       <nav class="flex items-center space-x-2">
         <button
-            @click="page > 1 && page--"
-            :disabled="page === 1"
-            class="px-4 py-2 rounded-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 disabled:opacity-50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          @click="page > 1 && page--"
+          :disabled="page === 1"
+          class="px-4 py-2 rounded-xl bg-white dark:bg-titanium-900 border border-titanium-300 dark:border-titanium-700 disabled:opacity-50 text-titanium-700 dark:text-titanium-300 hover:border-mintreu-red-600/50 transition-colors"
         >
           <Icon name="lucide:chevron-left" class="w-5 h-5" />
         </button>
 
         <button
-            v-for="p in paginationRange"
-            :key="p"
-            @click="page = p"
-            class="px-4 py-2 rounded-lg font-semibold transition-colors"
-            :class="page === p
-            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-            : 'bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800'"
+          v-for="p in paginationRange"
+          :key="p"
+          @click="page = p"
+          class="px-4 py-2 rounded-xl font-heading font-bold text-sm transition-all"
+          :class="page === p
+            ? 'bg-mintreu-red-600 text-white shadow-lg glow-red'
+            : 'bg-white dark:bg-titanium-900 border border-titanium-300 dark:border-titanium-700 text-titanium-700 dark:text-titanium-300 hover:border-mintreu-red-600/50'"
         >
           {{ p }}
         </button>
 
         <button
-            @click="page < products.meta.last_page && page++"
-            :disabled="page === products.meta.last_page"
-            class="px-4 py-2 rounded-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 disabled:opacity-50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          @click="page < products.meta.last_page && page++"
+          :disabled="page === products.meta.last_page"
+          class="px-4 py-2 rounded-xl bg-white dark:bg-titanium-900 border border-titanium-300 dark:border-titanium-700 disabled:opacity-50 text-titanium-700 dark:text-titanium-300 hover:border-mintreu-red-600/50 transition-colors"
         >
           <Icon name="lucide:chevron-right" class="w-5 h-5" />
         </button>
@@ -248,7 +239,12 @@
 </template>
 
 <script setup lang="ts">
+import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
 import type { PaginatedResponse, Product } from '~/types/api'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+gsap.registerPlugin(ScrollTrigger)
 
 interface Props {
   type?: string
@@ -259,27 +255,91 @@ interface Props {
 const props = defineProps<Props>()
 const productType = computed(() => props.type || '')
 
-const api = useApi()
+const sectionRef = ref<HTMLElement | null>(null)
+let ctx: gsap.Context | null = null
+
 const currency = inject('currency', ref('USD'))
 const page = ref(1)
 const searchQuery = ref('')
 const activeCategory = ref('')
-const sortBy = ref('latest')
+const sortBy = ref<'latest' | 'popular' | 'price_low' | 'price_high'>('latest')
+const categories = ref<string[]>([])
+const products = ref<PaginatedResponse<Product> | null>(null)
+const pending = ref(false)
+const fetchError = ref<Error | null>(null)
 
-const { data: rawCategories } = await useAsyncData('categories-products', () => api.getCategories({ type: 'products' }));\nconst categories = computed(() => ['All', ...(rawCategories.value || []).map(c => c.name)])
+const { getProducts, getCategories } = useApi()
 
-const { data: products, pending } = await useAsyncData<PaginatedResponse<Product>>(
-  computed(() => `products-${productType.value}-${page.value}-${searchQuery.value}-${activeCategory.value}-${sortBy.value}`),
-  () => api.getProducts({
-    page: page.value,
-    search: searchQuery.value || undefined,
-    category: activeCategory.value || undefined,
-    type: productType.value || undefined,
-    sort: sortBy.value,
-    per_page: 12
-  }),
-  { watch: [page, searchQuery, activeCategory, sortBy] }
+const loadCategories = async () => {
+  try {
+    const response = await getCategories({ type: 'products' }) as any
+    const items = Array.isArray(response)
+      ? response
+      : Array.isArray(response?.data)
+        ? response.data
+        : []
+    if (items.length) {
+      categories.value = items.map((c: any) => c.name)
+    }
+  } catch (error) {
+    console.error('Unable to load categories', error)
+  }
+}
+
+const fetchProducts = async () => {
+  pending.value = true
+  fetchError.value = null
+  try {
+    const response = await getProducts({
+      page: page.value,
+      search: searchQuery.value || undefined,
+      category: activeCategory.value || undefined,
+      type: productType.value || undefined,
+      sort: sortBy.value,
+      per_page: 12
+    }) as any
+    products.value = response ?? null
+  } catch (error) {
+    fetchError.value = error as Error
+    console.error('Unable to load products', error)
+  } finally {
+    pending.value = false
+    initAnimations()
+  }
+}
+
+const initAnimations = () => {
+  ctx?.revert()
+  if (!sectionRef.value) return
+  ctx = gsap.context(() => {
+    gsap.from('.product-header', {
+      y: 40, opacity: 0, duration: 0.8, ease: 'power3.out',
+      scrollTrigger: { trigger: '.product-header', start: 'top 85%' },
+    })
+
+    const cards = gsap.utils.toArray('.product-card') as HTMLElement[]
+    cards.forEach((card, i) => {
+      gsap.from(card, {
+        y: 50, opacity: 0, scale: 0.95,
+        duration: 0.7, delay: i * 0.06,
+        ease: 'back.out(1.3)',
+        scrollTrigger: { trigger: card, start: 'top 90%' },
+      })
+    })
+  }, sectionRef.value)
+}
+
+onMounted(() => {
+  loadCategories()
+})
+
+watch(
+  [page, searchQuery, activeCategory, sortBy, productType],
+  () => { fetchProducts() },
+  { immediate: true }
 )
+
+onUnmounted(() => { ctx?.revert() })
 
 const paginationRange = computed(() => {
   if (!products.value?.meta) return []
@@ -292,33 +352,30 @@ const paginationRange = computed(() => {
   return range
 })
 
-const getTypeBadgeClass = (type: string) => {
-  if (type === 'api') return 'bg-purple-500/20 border-purple-300/30 text-white'
-  if (type === 'template' || type === 'plugin') return 'bg-blue-500/20 border-blue-300/30 text-white'
-  if (type === 'freebie') return 'bg-green-500/20 border-green-300/30 text-white'
-  if (type === 'media') return 'bg-pink-500/20 border-pink-300/30 text-white'
-  return 'bg-white/20 border-white/30 text-white'
+const formatPrice = (price: number) => {
+  if (price === 0) return 'Free'
+  return currency.value === 'USD' ? `$${price}` : `\u20B9${(price * 82).toFixed(0)}`
 }
 
 const getTypeLabel = (type: string) => {
   const labels: Record<string, string> = {
-    api: 'API',
-    template: 'Template',
-    plugin: 'Plugin',
-    freebie: 'Free',
-    media: 'Media'
+    api: 'API', template: 'Template', plugin: 'Plugin', freebie: 'Free', media: 'Media'
   }
   return labels[type] || type || 'Product'
 }
-
-const getButtonClass = (type: string) => {
-  if (type === 'api') return 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white'
-  return 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white'
-}
-
-const getButtonText = (type: string) => {
-  if (type === 'api') return 'Start Free Trial'
-  if (type === 'freebie') return 'Download Free'
-  return 'View Details'
-}
 </script>
+
+<style scoped>
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>

@@ -102,6 +102,26 @@ export default function useApi() {
     })
   }
 
+  const getArticle = (slug: string) => {
+    return useSanctumFetch<ApiResponse<Article>>(`/api/articles/${slug}`, {
+      method: 'GET'
+    })
+  }
+
+  // ==================== CONTACT ====================
+  const submitContact = (data: {
+    name: string
+    email: string
+    project_type?: string
+    budget?: string
+    message: string
+  }) => {
+    return useSanctumFetch('/api/contact', {
+      method: 'POST',
+      body: data
+    })
+  }
+
   // ==================== CATEGORIES ====================
   const getCategories = (params?: {
     type?: string
@@ -121,6 +141,8 @@ export default function useApi() {
     getProducts,
     getProduct,
     getArticles,
+    getArticle,
+    submitContact,
     getCategories
   }
 }

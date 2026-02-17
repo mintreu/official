@@ -31,7 +31,7 @@ class CategoryController extends Controller
             }
         }
 
-        return CategoryResource::collection($query->get());
+        return CategoryResource::collection($query->get())->response();
     }
 
     /**

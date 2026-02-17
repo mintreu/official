@@ -9,7 +9,7 @@ use App\Filament\Resources\Advertisements\Pages\ViewAdvertisement;
 use App\Filament\Resources\Advertisements\Schemas\AdvertisementForm;
 use App\Filament\Resources\Advertisements\Schemas\AdvertisementInfolist;
 use App\Filament\Resources\Advertisements\Tables\AdvertisementsTable;
-use App\Models\Advertisement;
+use App\Models\Content\Advertisement;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;

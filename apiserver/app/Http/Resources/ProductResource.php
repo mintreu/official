@@ -10,6 +10,11 @@ class ProductResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $engagement = $this->engagement;
+        $downloads = $engagement?->downloads ?? (int) $this->downloads;
+        $rating = $engagement?->rating ?? (float) $this->rating;
+        $version = $engagement?->version ?? $this->version;
+
         $data = [
             'slug' => $this->slug,
             'title' => $this->title,
@@ -22,13 +27,18 @@ class ProductResource extends JsonResource
             'type_label' => $this->type?->getLabel(),
             'demo_url' => $this->demo_url,
             'documentation_url' => $this->documentation_url,
-            'version' => $this->version,
-            'downloads' => (int) $this->downloads,
-            'rating' => (float) $this->rating,
+            'version' => $version,
+            'downloads' => $downloads,
+            'rating' => $rating,
             'featured' => (bool) $this->featured,
             'requires_auth' => (bool) $this->requires_auth,
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
+            'engagement' => [
+                'downloads' => $downloads,
+                'rating' => $rating,
+                'version' => $version,
+            ],
         ];
 
         // Only show GitHub URL for freebies (backlink)

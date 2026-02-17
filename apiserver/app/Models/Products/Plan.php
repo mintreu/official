@@ -8,6 +8,7 @@ use App\Models\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Plan - Pricing tier for a product
@@ -146,5 +147,17 @@ class Plan extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('sort_order')->orderBy('price_cents');
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (Plan $plan): void {
+            $product = $plan->product;
+            if ($product && ! $product->isApiProduct()) {
+                throw ValidationException::withMessages([
+                    'product_id' => 'Plans can only be assigned to API products.',
+                ]);
+            }
+        });
     }
 }

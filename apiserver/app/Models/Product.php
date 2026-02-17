@@ -10,9 +10,12 @@ use App\Models\Licensing\License;
 use App\Models\Products\DownloadLog;
 use App\Models\Products\Plan;
 use App\Models\Products\ProductSource;
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Str;
 
 /**
@@ -153,6 +156,24 @@ class Product extends Model
         return $this->hasMany(DownloadLog::class);
     }
 
+    /**
+     * Categories (via categoryable pivot)
+     */
+    public function categories(): MorphToMany
+    {
+        return $this->morphToMany(Category::class, 'categoryable');
+    }
+    
+    public function engagement(): HasOne
+    {
+        return $this->hasOne(\App\Models\Products\ProductEngagement::class);
+    }
+
+    public function getCategoriesNamesAttribute(): array
+    {
+        return $this->categories->pluck('name')->toArray();
+    }
+
     // ===== COMPUTED PROPERTIES =====
 
     /**
@@ -244,6 +265,4 @@ class Product extends Model
     // ===== BOOT =====
 
 
-
 }
-

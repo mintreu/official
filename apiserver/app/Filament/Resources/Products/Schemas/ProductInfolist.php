@@ -20,7 +20,6 @@ class ProductInfolist
                     ->money(),
                 TextEntry::make('category'),
                 TextEntry::make('type'),
-                TextEntry::make('download_url'),
                 TextEntry::make('demo_url'),
                 TextEntry::make('github_url'),
                 TextEntry::make('documentation_url'),
@@ -32,11 +31,10 @@ class ProductInfolist
                 TextEntry::make('status'),
                 IconEntry::make('featured')
                     ->boolean(),
-                IconEntry::make('is_payable')
+                IconEntry::make('requires_auth')
                     ->boolean(),
-                IconEntry::make('requires_account')
-                    ->boolean(),
-                TextEntry::make('default_license_type'),
+                TextEntry::make('default_license'),
+                TextEntry::make('short_description'),
                 TextEntry::make('created_at')
                     ->dateTime(),
                 TextEntry::make('updated_at')

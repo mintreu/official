@@ -18,11 +18,18 @@ use Filament\Tables\Table;
 
 class StorageProviderResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = StorageProvider::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function canViewAny(): bool
+    {
+        return false;
+    }
 
     public static function form(Schema $schema): Schema
     {

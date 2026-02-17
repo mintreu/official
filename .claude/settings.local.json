@@ -3,7 +3,8 @@
     "allow": [
       "Bash(curl:*)",
       "Bash(vendor/bin/pint:*)",
-      "Bash(php:*)"
+      "Bash(php:*)",
+      "mcp__frontend-filesystem__read_file"
     ]
   },
   "enableAllProjectMcpServers": true,
