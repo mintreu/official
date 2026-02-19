@@ -13,78 +13,6 @@ const error = ref<Error | null>(null)
 let ctx: gsap.Context | null = null
 const { getCaseStudies: fetchCaseStudies } = useApi()
 
-const showcaseCaseStudies: CaseStudy[] = [
-  {
-    slug: 'saas-platform-migration',
-    title: 'Enterprise SaaS Platform Migration',
-    description: 'Complete infrastructure migration from monolithic PHP to microservices architecture, resulting in 99.9% uptime and 3x performance improvement.',
-    content: '',
-    image: '',
-    client: 'TechCorp Inc.',
-    industry: 'FinTech',
-    duration: '4 months',
-    technologies: ['Laravel', 'Docker', 'Kubernetes', 'Redis', 'PostgreSQL'],
-    challenge: 'Legacy monolithic application struggling with 15-minute deploy times, frequent outages during peak hours, and inability to scale individual services independently.',
-    solution: 'Decomposed the monolith into 12 microservices with Docker containers orchestrated by Kubernetes. Implemented Redis caching layer and PostgreSQL read replicas for database optimization.',
-    results: [
-      { value: '99.9%', label: 'Uptime' },
-      { value: '3x', label: 'Faster' },
-      { value: '60%', label: 'Cost Reduced' },
-    ],
-    status: 'published',
-    featured: true,
-    created_at: '2025-07-10T00:00:00Z',
-    updated_at: '2025-07-10T00:00:00Z',
-    id: 0,
-  },
-  {
-    slug: 'healthcare-patient-portal',
-    title: 'Healthcare Patient Portal',
-    description: 'HIPAA-compliant telemedicine platform serving 50K+ patients with real-time video consultations, appointment scheduling, and integrated health records.',
-    content: '',
-    image: '',
-    client: 'MedConnect Health',
-    industry: 'Healthcare',
-    duration: '6 months',
-    technologies: ['React', 'Node.js', 'MongoDB', 'WebRTC', 'AWS'],
-    challenge: 'Healthcare provider needed a unified platform to manage patient records, enable telemedicine, and ensure HIPAA compliance across all data touchpoints.',
-    solution: 'Built a full-stack telemedicine platform with end-to-end encryption, WebRTC-based video consultations, automated appointment scheduling, and real-time health monitoring dashboards.',
-    results: [
-      { value: '50K+', label: 'Active Users' },
-      { value: '40%', label: 'Efficiency Gain' },
-      { value: '100%', label: 'HIPAA Compliant' },
-    ],
-    status: 'published',
-    featured: true,
-    created_at: '2025-04-20T00:00:00Z',
-    updated_at: '2025-04-20T00:00:00Z',
-    id: 0,
-  },
-  {
-    slug: 'ecommerce-marketplace',
-    title: 'Multi-Vendor E-Commerce Marketplace',
-    description: 'High-performance marketplace processing 2M+ transactions monthly with real-time inventory sync, multi-currency support, and AI-powered recommendations.',
-    content: '',
-    image: '',
-    client: 'ShopGlobal Ltd.',
-    industry: 'Retail & E-Commerce',
-    duration: '3 months',
-    technologies: ['Laravel', 'Nuxt.js', 'Stripe', 'Elasticsearch', 'Redis'],
-    challenge: 'Existing platform couldn\'t handle growing transaction volume, had slow search, and lacked multi-vendor support needed for marketplace expansion to 15 countries.',
-    solution: 'Rebuilt the platform with Laravel backend and Nuxt.js SSR frontend. Integrated Elasticsearch for sub-200ms search, Stripe Connect for multi-vendor payouts, and Redis for real-time inventory.',
-    results: [
-      { value: '2M+', label: 'Transactions/mo' },
-      { value: '200ms', label: 'Response Time' },
-      { value: '150%', label: 'Revenue Growth' },
-    ],
-    status: 'published',
-    featured: true,
-    created_at: '2025-01-15T00:00:00Z',
-    updated_at: '2025-01-15T00:00:00Z',
-    id: 0,
-  },
-]
-
 const getResults = (caseStudy: CaseStudy) => {
   if (typeof caseStudy.results === 'string') {
     try { return JSON.parse(caseStudy.results) }
@@ -99,10 +27,10 @@ const loadCaseStudies = async () => {
   try {
     const response = await fetchCaseStudies({ featured: true, per_page: 3 }) as any
     const items = response?.data ?? []
-    caseStudies.value = items.length ? items : showcaseCaseStudies
+    caseStudies.value = items
   } catch (err) {
-    error.value = null
-    caseStudies.value = showcaseCaseStudies
+    error.value = err as Error
+    caseStudies.value = []
   } finally {
     pending.value = false
   }

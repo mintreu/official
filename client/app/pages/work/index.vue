@@ -1,33 +1,15 @@
 <template>
-  <div class="min-h-screen bg-titanium-50 dark:bg-titanium-950 py-8 relative">
-    <div class="absolute inset-0 bg-blueprint-fine pointer-events-none"></div>
+  <div class="min-h-screen bg-titanium-50 dark:bg-titanium-950 relative">
+    <!-- 3D Hero -->
+    <SharedPageHero
+      badge="Portfolio"
+      title="Our <span class='text-transparent bg-clip-text bg-gradient-to-r from-mintreu-red-400 via-mintreu-red-500 to-mintreu-red-600'>Work</span>"
+      subtitle="Explore our portfolio of successful projects and digital solutions delivered to clients worldwide"
+    />
 
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Breadcrumb -->
-      <nav class="flex items-center space-x-2 text-sm mb-8">
-        <NuxtLink to="/" class="text-titanium-500 hover:text-mintreu-red-600 font-subheading transition-colors">
-          Home
-        </NuxtLink>
-        <Icon name="lucide:chevron-right" class="w-4 h-4 text-titanium-400" />
-        <span class="text-titanium-900 dark:text-white font-heading font-bold text-xs uppercase tracking-wider">Our Work</span>
-      </nav>
+    <div class="absolute inset-0 bg-blueprint-fine pointer-events-none" style="top: 50vh;"></div>
 
-      <!-- Header -->
-      <div ref="sectionRef" class="work-header text-center mb-16">
-        <div class="inline-block mb-4">
-          <span class="px-4 py-2 bg-mintreu-red-100 dark:bg-mintreu-red-900/30 text-mintreu-red-700 dark:text-mintreu-red-400 rounded-full text-sm font-heading font-bold uppercase tracking-wider">
-            Portfolio
-          </span>
-        </div>
-        <h1 class="text-4xl sm:text-5xl md:text-6xl font-heading font-black mb-6 text-titanium-900 dark:text-white">
-          Our <span class="text-mintreu-red-600">Work</span>
-        </h1>
-        <p class="text-lg text-titanium-600 dark:text-titanium-400 max-w-2xl mx-auto font-subheading">
-          Explore our portfolio of successful projects and digital solutions delivered to clients worldwide
-        </p>
-        <div class="line-technical mt-8 mx-auto max-w-md"></div>
-      </div>
-
+    <div ref="sectionRef" class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-1 pt-8">
       <!-- Filters -->
       <div class="mb-12">
         <div class="flex flex-col lg:flex-row gap-4 items-center justify-between mb-6">
@@ -82,9 +64,9 @@
       </div>
 
       <!-- Projects Grid -->
-      <div v-else-if="projects?.data && projects.data.length > 0" class="perspective-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div v-else-if="projectItems.length > 0" class="perspective-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <NuxtLink
-          v-for="project in projects.data"
+          v-for="project in projectItems"
           :key="project.slug"
           :to="`/work/${project.slug}`"
           class="project-card group relative bg-white dark:bg-titanium-900 rounded-3xl overflow-hidden border border-dashed border-titanium-300 dark:border-titanium-700 hover:border-mintreu-red-600/50 dark:hover:border-mintreu-red-600/50 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
@@ -162,37 +144,17 @@
         <p class="text-titanium-600 dark:text-titanium-400 font-subheading">Try adjusting your search or filters</p>
       </div>
 
-      <!-- Pagination -->
-      <div v-if="projects && projects.meta && projects.meta.last_page > 1" class="mt-12 flex justify-center">
-        <nav class="flex items-center space-x-2">
-          <button
-            @click="page > 1 && page--"
-            :disabled="page === 1"
-            class="px-4 py-2 rounded-xl bg-white dark:bg-titanium-900 border border-titanium-300 dark:border-titanium-700 disabled:opacity-50 text-titanium-700 dark:text-titanium-300 hover:border-mintreu-red-600/50 transition-colors"
-          >
-            <Icon name="lucide:chevron-left" class="w-5 h-5" />
-          </button>
-
-          <button
-            v-for="p in paginationRange"
-            :key="p"
-            @click="page = p"
-            class="px-4 py-2 rounded-xl font-heading font-bold text-sm transition-all"
-            :class="page === p
-              ? 'bg-mintreu-red-600 text-white shadow-lg glow-red'
-              : 'bg-white dark:bg-titanium-900 border border-titanium-300 dark:border-titanium-700 text-titanium-700 dark:text-titanium-300 hover:border-mintreu-red-600/50'"
-          >
-            {{ p }}
-          </button>
-
-          <button
-            @click="page < projects.meta.last_page && page++"
-            :disabled="page === projects.meta.last_page"
-            class="px-4 py-2 rounded-xl bg-white dark:bg-titanium-900 border border-titanium-300 dark:border-titanium-700 disabled:opacity-50 text-titanium-700 dark:text-titanium-300 hover:border-mintreu-red-600/50 transition-colors"
-          >
-            <Icon name="lucide:chevron-right" class="w-5 h-5" />
-          </button>
-        </nav>
+      <!-- Load More -->
+      <div v-if="hasMore" class="mt-12 flex justify-center">
+        <button
+          @click="loadMore"
+          :disabled="loadingMore"
+          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-mintreu-red-600 hover:bg-mintreu-red-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-heading font-bold shadow-lg transition-all duration-300"
+        >
+          <Icon v-if="loadingMore" name="lucide:loader-2" class="w-4 h-4 animate-spin" />
+          <Icon v-else name="lucide:plus" class="w-4 h-4" />
+          <span>{{ loadingMore ? 'Loading...' : 'Load More Projects' }}</span>
+        </button>
       </div>
     </div>
   </div>
@@ -219,8 +181,10 @@ const searchQuery = ref('')
 const activeCategory = ref('All')
 const sortBy = ref<'latest' | 'oldest' | 'title'>('latest')
 const categories = ref<string[]>(['All'])
-const projects = ref<PaginatedResponse<Project> | null>(null)
+const projectItems = ref<Project[]>([])
+const paginationMeta = ref<PaginatedResponse<Project>['meta'] | null>(null)
 const pending = ref(false)
+const loadingMore = ref(false)
 const fetchError = ref<Error | null>(null)
 
 const { getProjects, getCategories } = useApi()
@@ -241,8 +205,18 @@ const loadCategories = async () => {
   }
 }
 
-const fetchProjectsList = async () => {
-  pending.value = true
+const normalizePaginated = (response: any): PaginatedResponse<Project> | null => {
+  if (response?.data && Array.isArray(response.data) && response?.meta) return response as PaginatedResponse<Project>
+  if (response?.data?.data && Array.isArray(response.data.data) && response?.data?.meta) return response.data as PaginatedResponse<Project>
+  return null
+}
+
+const fetchProjectsList = async (append = false) => {
+  if (append) {
+    loadingMore.value = true
+  } else {
+    pending.value = true
+  }
   fetchError.value = null
   try {
     const response = await getProjects({
@@ -252,12 +226,17 @@ const fetchProjectsList = async () => {
       sort: sortBy.value,
       per_page: 9
     }) as any
-    projects.value = response ?? null
+    const normalized = normalizePaginated(response)
+    const items = normalized?.data ?? []
+
+    projectItems.value = append ? [...projectItems.value, ...items] : items
+    paginationMeta.value = normalized?.meta ?? null
   } catch (error) {
     fetchError.value = error as Error
     console.error('Unable to load projects', error)
   } finally {
     pending.value = false
+    loadingMore.value = false
     initAnimations()
   }
 }
@@ -266,23 +245,20 @@ const initAnimations = () => {
   ctx?.revert()
   if (!sectionRef.value) return
   ctx = gsap.context(() => {
-    // Header
-    gsap.from('.work-header', {
-      y: 40, opacity: 0, duration: 0.8, ease: 'power3.out',
-      scrollTrigger: { trigger: '.work-header', start: 'top 85%' },
-    })
-
-    // Cards stagger entrance
     const cards = gsap.utils.toArray('.project-card') as HTMLElement[]
-    cards.forEach((card, i) => {
-      gsap.from(card, {
-        y: 50, opacity: 0, scale: 0.95,
-        duration: 0.7, delay: i * 0.08,
-        ease: 'back.out(1.3)',
-        scrollTrigger: { trigger: card, start: 'top 90%' },
+    if (cards.length) {
+      gsap.set(cards, { opacity: 0, y: 50, scale: 0.95 })
+      ScrollTrigger.create({
+        trigger: cards[0],
+        start: 'top 92%',
+        once: true,
+        onEnter: () => {
+          gsap.to(cards, { opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.08, ease: 'back.out(1.3)' })
+        }
       })
-    })
+    }
   }, sectionRef.value)
+  ScrollTrigger.refresh()
 }
 
 onMounted(() => {
@@ -290,23 +266,27 @@ onMounted(() => {
 })
 
 watch(
-  [page, searchQuery, activeCategory, sortBy],
-  () => { fetchProjectsList() },
+  [searchQuery, activeCategory, sortBy],
+  () => {
+    page.value = 1
+    projectItems.value = []
+    fetchProjectsList(false)
+  },
   { immediate: true }
 )
 
 onUnmounted(() => { ctx?.revert() })
 
-const paginationRange = computed(() => {
-  if (!projects.value?.meta) return []
-  const total = projects.value.meta.last_page
-  const current = page.value
-  const range = []
-  for (let i = Math.max(1, current - 2); i <= Math.min(total, current + 2); i++) {
-    range.push(i)
-  }
-  return range
+const hasMore = computed(() => {
+  if (!paginationMeta.value) return false
+  return paginationMeta.value.current_page < paginationMeta.value.last_page
 })
+
+const loadMore = async () => {
+  if (!hasMore.value || loadingMore.value) return
+  page.value += 1
+  await fetchProjectsList(true)
+}
 
 const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString('en-US', {

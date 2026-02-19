@@ -1,21 +1,5 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Header -->
-    <div ref="sectionRef" class="product-header text-center mb-16">
-      <div class="inline-block mb-4">
-        <span class="px-4 py-2 bg-mintreu-red-100 dark:bg-mintreu-red-900/30 text-mintreu-red-700 dark:text-mintreu-red-400 rounded-full text-sm font-heading font-bold uppercase tracking-wider">
-          {{ productType === 'api' ? 'APIs' : productType === 'template' ? 'Templates' : productType === 'freebie' ? 'Free' : 'Premium Solutions' }}
-        </span>
-      </div>
-      <h1 class="text-4xl sm:text-5xl md:text-6xl font-heading font-black mb-6 text-titanium-900 dark:text-white">
-        {{ title }}
-      </h1>
-      <p class="text-lg text-titanium-600 dark:text-titanium-400 max-w-2xl mx-auto font-subheading">
-        {{ subtitle }}
-      </p>
-      <div class="line-technical mt-8 mx-auto max-w-md"></div>
-    </div>
-
+  <div ref="sectionRef" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
     <!-- Quick Nav Tabs -->
     <div class="flex flex-wrap gap-2 justify-center mb-8">
       <NuxtLink
@@ -31,7 +15,7 @@
       <NuxtLink
         to="/products/apis"
         class="px-4 py-2 rounded-xl font-heading font-bold text-sm transition-all duration-300"
-        :class="productType === 'api'
+        :class="productType === 'api_service'
           ? 'bg-mintreu-red-600 text-white shadow-lg glow-red'
           : 'bg-white dark:bg-titanium-900 text-titanium-700 dark:text-titanium-300 border border-dashed border-titanium-300 dark:border-titanium-700 hover:border-mintreu-red-600/50'"
       >
@@ -41,7 +25,7 @@
       <NuxtLink
         to="/products/templates"
         class="px-4 py-2 rounded-xl font-heading font-bold text-sm transition-all duration-300"
-        :class="productType === 'template'
+        :class="productType === 'downloadable'
           ? 'bg-mintreu-red-600 text-white shadow-lg glow-red'
           : 'bg-white dark:bg-titanium-900 text-titanium-700 dark:text-titanium-300 border border-dashed border-titanium-300 dark:border-titanium-700 hover:border-mintreu-red-600/50'"
       >
@@ -123,9 +107,9 @@
     </div>
 
     <!-- Products Grid -->
-    <div v-else-if="products?.data && products.data.length > 0" class="perspective-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div v-else-if="productItems.length > 0" class="perspective-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       <NuxtLink
-        v-for="product in products.data"
+        v-for="product in productItems"
         :key="product.slug"
         :to="`/products/${product.slug}`"
         class="product-card group relative bg-white dark:bg-titanium-900 rounded-3xl overflow-hidden border border-dashed border-titanium-300 dark:border-titanium-700 hover:border-mintreu-red-600/50 dark:hover:border-mintreu-red-600/50 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
@@ -203,37 +187,17 @@
       <p class="text-titanium-600 dark:text-titanium-400 font-subheading">Try adjusting your filters</p>
     </div>
 
-    <!-- Pagination -->
-    <div v-if="products && products.meta && products.meta.last_page > 1" class="mt-12 flex justify-center">
-      <nav class="flex items-center space-x-2">
-        <button
-          @click="page > 1 && page--"
-          :disabled="page === 1"
-          class="px-4 py-2 rounded-xl bg-white dark:bg-titanium-900 border border-titanium-300 dark:border-titanium-700 disabled:opacity-50 text-titanium-700 dark:text-titanium-300 hover:border-mintreu-red-600/50 transition-colors"
-        >
-          <Icon name="lucide:chevron-left" class="w-5 h-5" />
-        </button>
-
-        <button
-          v-for="p in paginationRange"
-          :key="p"
-          @click="page = p"
-          class="px-4 py-2 rounded-xl font-heading font-bold text-sm transition-all"
-          :class="page === p
-            ? 'bg-mintreu-red-600 text-white shadow-lg glow-red'
-            : 'bg-white dark:bg-titanium-900 border border-titanium-300 dark:border-titanium-700 text-titanium-700 dark:text-titanium-300 hover:border-mintreu-red-600/50'"
-        >
-          {{ p }}
-        </button>
-
-        <button
-          @click="page < products.meta.last_page && page++"
-          :disabled="page === products.meta.last_page"
-          class="px-4 py-2 rounded-xl bg-white dark:bg-titanium-900 border border-titanium-300 dark:border-titanium-700 disabled:opacity-50 text-titanium-700 dark:text-titanium-300 hover:border-mintreu-red-600/50 transition-colors"
-        >
-          <Icon name="lucide:chevron-right" class="w-5 h-5" />
-        </button>
-      </nav>
+    <!-- Load More -->
+    <div v-if="hasMore" class="mt-12 flex justify-center">
+      <button
+        @click="loadMore"
+        :disabled="loadingMore"
+        class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-mintreu-red-600 hover:bg-mintreu-red-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-heading font-bold shadow-lg transition-all duration-300"
+      >
+        <Icon v-if="loadingMore" name="lucide:loader-2" class="w-4 h-4 animate-spin" />
+        <Icon v-else name="lucide:plus" class="w-4 h-4" />
+        <span>{{ loadingMore ? 'Loading...' : 'Load More Products' }}</span>
+      </button>
     </div>
   </div>
 </template>
@@ -264,8 +228,10 @@ const searchQuery = ref('')
 const activeCategory = ref('')
 const sortBy = ref<'latest' | 'popular' | 'price_low' | 'price_high'>('latest')
 const categories = ref<string[]>([])
-const products = ref<PaginatedResponse<Product> | null>(null)
+const productItems = ref<Product[]>([])
+const paginationMeta = ref<PaginatedResponse<Product>['meta'] | null>(null)
 const pending = ref(false)
+const loadingMore = ref(false)
 const fetchError = ref<Error | null>(null)
 
 const { getProducts, getCategories } = useApi()
@@ -286,8 +252,18 @@ const loadCategories = async () => {
   }
 }
 
-const fetchProducts = async () => {
-  pending.value = true
+const normalizePaginated = (response: any): PaginatedResponse<Product> | null => {
+  if (response?.data && Array.isArray(response.data) && response?.meta) return response as PaginatedResponse<Product>
+  if (response?.data?.data && Array.isArray(response.data.data) && response?.data?.meta) return response.data as PaginatedResponse<Product>
+  return null
+}
+
+const fetchProducts = async (append = false) => {
+  if (append) {
+    loadingMore.value = true
+  } else {
+    pending.value = true
+  }
   fetchError.value = null
   try {
     const response = await getProducts({
@@ -298,12 +274,17 @@ const fetchProducts = async () => {
       sort: sortBy.value,
       per_page: 12
     }) as any
-    products.value = response ?? null
+    const normalized = normalizePaginated(response)
+    const items = normalized?.data ?? []
+
+    productItems.value = append ? [...productItems.value, ...items] : items
+    paginationMeta.value = normalized?.meta ?? null
   } catch (error) {
     fetchError.value = error as Error
     console.error('Unable to load products', error)
   } finally {
     pending.value = false
+    loadingMore.value = false
     initAnimations()
   }
 }
@@ -312,21 +293,20 @@ const initAnimations = () => {
   ctx?.revert()
   if (!sectionRef.value) return
   ctx = gsap.context(() => {
-    gsap.from('.product-header', {
-      y: 40, opacity: 0, duration: 0.8, ease: 'power3.out',
-      scrollTrigger: { trigger: '.product-header', start: 'top 85%' },
-    })
-
     const cards = gsap.utils.toArray('.product-card') as HTMLElement[]
-    cards.forEach((card, i) => {
-      gsap.from(card, {
-        y: 50, opacity: 0, scale: 0.95,
-        duration: 0.7, delay: i * 0.06,
-        ease: 'back.out(1.3)',
-        scrollTrigger: { trigger: card, start: 'top 90%' },
+    if (cards.length) {
+      gsap.set(cards, { opacity: 0, y: 50, scale: 0.95 })
+      ScrollTrigger.create({
+        trigger: cards[0],
+        start: 'top 92%',
+        once: true,
+        onEnter: () => {
+          gsap.to(cards, { opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.06, ease: 'back.out(1.3)' })
+        }
       })
-    })
+    }
   }, sectionRef.value)
+  ScrollTrigger.refresh()
 }
 
 onMounted(() => {
@@ -334,23 +314,27 @@ onMounted(() => {
 })
 
 watch(
-  [page, searchQuery, activeCategory, sortBy, productType],
-  () => { fetchProducts() },
+  [searchQuery, activeCategory, sortBy, productType],
+  () => {
+    page.value = 1
+    productItems.value = []
+    fetchProducts(false)
+  },
   { immediate: true }
 )
 
 onUnmounted(() => { ctx?.revert() })
 
-const paginationRange = computed(() => {
-  if (!products.value?.meta) return []
-  const total = products.value.meta.last_page
-  const current = page.value
-  const range = []
-  for (let i = Math.max(1, current - 2); i <= Math.min(total, current + 2); i++) {
-    range.push(i)
-  }
-  return range
+const hasMore = computed(() => {
+  if (!paginationMeta.value) return false
+  return paginationMeta.value.current_page < paginationMeta.value.last_page
 })
+
+const loadMore = async () => {
+  if (!hasMore.value || loadingMore.value) return
+  page.value += 1
+  await fetchProducts(true)
+}
 
 const formatPrice = (price: number) => {
   if (price === 0) return 'Free'
@@ -359,7 +343,11 @@ const formatPrice = (price: number) => {
 
 const getTypeLabel = (type: string) => {
   const labels: Record<string, string> = {
-    api: 'API', template: 'Template', plugin: 'Plugin', freebie: 'Free', media: 'Media'
+    api_service: 'API',
+    api_referral: 'API',
+    downloadable: 'Template',
+    freebie: 'Free',
+    demo: 'Demo'
   }
   return labels[type] || type || 'Product'
 }

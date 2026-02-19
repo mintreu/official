@@ -14,9 +14,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             AdminSeeder::class,
-            ProjectSeeder::class,
-            CaseStudySeeder::class,
-            ProductSeeder::class,
+            IntegrationSeeder::class,
+            ProductionProjectSeeder::class,
+            ProductionCaseStudySeeder::class,
+            ProductionProductSeeder::class,
             DashboardDemoSeeder::class,
             FreebieSampleSeeder::class,
             ArticleSeeder::class,

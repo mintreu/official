@@ -1,33 +1,15 @@
 <template>
-  <div class="min-h-screen bg-titanium-50 dark:bg-titanium-950 py-8 relative">
-    <div class="absolute inset-0 bg-blueprint-fine pointer-events-none"></div>
+  <div class="min-h-screen bg-titanium-50 dark:bg-titanium-950 relative">
+    <!-- 3D Hero -->
+    <SharedPageHero
+      badge="Success Stories"
+      title="Client <span class='text-transparent bg-clip-text bg-gradient-to-r from-mintreu-red-400 via-mintreu-red-500 to-mintreu-red-600'>Case Studies</span>"
+      subtitle="Real projects with measurable results and proven ROI for our clients worldwide"
+    />
 
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Breadcrumb -->
-      <nav class="flex items-center space-x-2 text-sm mb-8">
-        <NuxtLink to="/" class="text-titanium-500 hover:text-mintreu-red-600 font-subheading transition-colors">
-          Home
-        </NuxtLink>
-        <Icon name="lucide:chevron-right" class="w-4 h-4 text-titanium-400" />
-        <span class="text-titanium-900 dark:text-white font-heading font-bold text-xs uppercase tracking-wider">Case Studies</span>
-      </nav>
+    <div class="absolute inset-0 bg-blueprint-fine pointer-events-none" style="top: 50vh;"></div>
 
-      <!-- Header -->
-      <div ref="sectionRef" class="cs-header text-center mb-16">
-        <div class="inline-block mb-4">
-          <span class="px-4 py-2 bg-mintreu-red-100 dark:bg-mintreu-red-900/30 text-mintreu-red-700 dark:text-mintreu-red-400 rounded-full text-sm font-heading font-bold uppercase tracking-wider">
-            Success Stories
-          </span>
-        </div>
-        <h1 class="text-4xl sm:text-5xl md:text-6xl font-heading font-black mb-6 text-titanium-900 dark:text-white">
-          Client <span class="text-mintreu-red-600">Case Studies</span>
-        </h1>
-        <p class="text-lg text-titanium-600 dark:text-titanium-400 max-w-2xl mx-auto font-subheading">
-          Real projects with measurable results and proven ROI for our clients worldwide
-        </p>
-        <div class="line-technical mt-8 mx-auto max-w-md"></div>
-      </div>
-
+    <div ref="sectionRef" class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-1 pt-8">
       <!-- Filters -->
       <div class="flex flex-wrap gap-3 justify-center mb-12">
         <button
@@ -65,9 +47,9 @@
       </div>
 
       <!-- Case Studies List -->
-      <div v-else-if="caseStudies?.data && caseStudies.data.length > 0" class="space-y-16">
+      <div v-else-if="caseStudyItems.length > 0" class="space-y-16">
         <div
-          v-for="(study, index) in caseStudies.data"
+          v-for="(study, index) in caseStudyItems"
           :key="study.slug"
           class="cs-card group relative bg-white dark:bg-titanium-900 rounded-3xl overflow-hidden border border-dashed border-titanium-300 dark:border-titanium-700 hover:border-mintreu-red-600/50 dark:hover:border-mintreu-red-600/50 shadow-xl hover:shadow-2xl transition-all duration-500"
         >
@@ -157,37 +139,17 @@
         <p class="text-titanium-600 dark:text-titanium-400 font-subheading">Check back soon for new success stories</p>
       </div>
 
-      <!-- Pagination -->
-      <div v-if="caseStudies && caseStudies.meta && caseStudies.meta.last_page > 1" class="mt-12 flex justify-center">
-        <nav class="flex items-center space-x-2">
-          <button
-            @click="page > 1 && page--"
-            :disabled="page === 1"
-            class="px-4 py-2 rounded-xl bg-white dark:bg-titanium-900 border border-titanium-300 dark:border-titanium-700 disabled:opacity-50 text-titanium-700 dark:text-titanium-300 hover:border-mintreu-red-600/50 transition-colors"
-          >
-            <Icon name="lucide:chevron-left" class="w-5 h-5" />
-          </button>
-
-          <button
-            v-for="p in paginationRange"
-            :key="p"
-            @click="page = p"
-            class="px-4 py-2 rounded-xl font-heading font-bold text-sm transition-all"
-            :class="page === p
-              ? 'bg-mintreu-red-600 text-white shadow-lg glow-red'
-              : 'bg-white dark:bg-titanium-900 border border-titanium-300 dark:border-titanium-700 text-titanium-700 dark:text-titanium-300 hover:border-mintreu-red-600/50'"
-          >
-            {{ p }}
-          </button>
-
-          <button
-            @click="page < caseStudies.meta.last_page && page++"
-            :disabled="page === caseStudies.meta.last_page"
-            class="px-4 py-2 rounded-xl bg-white dark:bg-titanium-900 border border-titanium-300 dark:border-titanium-700 disabled:opacity-50 text-titanium-700 dark:text-titanium-300 hover:border-mintreu-red-600/50 transition-colors"
-          >
-            <Icon name="lucide:chevron-right" class="w-5 h-5" />
-          </button>
-        </nav>
+      <!-- Load More -->
+      <div v-if="hasMore" class="mt-12 flex justify-center">
+        <button
+          @click="loadMore"
+          :disabled="loadingMore"
+          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-mintreu-red-600 hover:bg-mintreu-red-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-heading font-bold shadow-lg transition-all duration-300"
+        >
+          <Icon v-if="loadingMore" name="lucide:loader-2" class="w-4 h-4 animate-spin" />
+          <Icon v-else name="lucide:plus" class="w-4 h-4" />
+          <span>{{ loadingMore ? 'Loading...' : 'Load More Case Studies' }}</span>
+        </button>
       </div>
     </div>
   </div>
@@ -212,8 +174,10 @@ let ctx: gsap.Context | null = null
 const page = ref(1)
 const activeFilter = ref('All')
 const filters = ref<string[]>(['All'])
-const caseStudies = ref<PaginatedResponse<CaseStudy> | null>(null)
+const caseStudyItems = ref<CaseStudy[]>([])
+const paginationMeta = ref<PaginatedResponse<CaseStudy>['meta'] | null>(null)
 const pending = ref(false)
+const loadingMore = ref(false)
 const fetchError = ref<Error | null>(null)
 
 const { getCaseStudies: fetchCaseStudiesApi, getCategories } = useApi()
@@ -234,8 +198,18 @@ const loadCategories = async () => {
   }
 }
 
-const fetchCaseStudies = async () => {
-  pending.value = true
+const normalizePaginated = (response: any): PaginatedResponse<CaseStudy> | null => {
+  if (response?.data && Array.isArray(response.data) && response?.meta) return response as PaginatedResponse<CaseStudy>
+  if (response?.data?.data && Array.isArray(response.data.data) && response?.data?.meta) return response.data as PaginatedResponse<CaseStudy>
+  return null
+}
+
+const fetchCaseStudies = async (append = false) => {
+  if (append) {
+    loadingMore.value = true
+  } else {
+    pending.value = true
+  }
   fetchError.value = null
   try {
     const response = await fetchCaseStudiesApi({
@@ -243,12 +217,17 @@ const fetchCaseStudies = async () => {
       category: activeFilter.value !== 'All' ? activeFilter.value : undefined,
       per_page: 6
     }) as any
-    caseStudies.value = response ?? null
+    const normalized = normalizePaginated(response)
+    const items = normalized?.data ?? []
+
+    caseStudyItems.value = append ? [...caseStudyItems.value, ...items] : items
+    paginationMeta.value = normalized?.meta ?? null
   } catch (error) {
     fetchError.value = error as Error
     console.error('Unable to load case studies', error)
   } finally {
     pending.value = false
+    loadingMore.value = false
     initAnimations()
   }
 }
@@ -257,21 +236,20 @@ const initAnimations = () => {
   ctx?.revert()
   if (!sectionRef.value) return
   ctx = gsap.context(() => {
-    gsap.from('.cs-header', {
-      y: 40, opacity: 0, duration: 0.8, ease: 'power3.out',
-      scrollTrigger: { trigger: '.cs-header', start: 'top 85%' },
-    })
-
     const cards = gsap.utils.toArray('.cs-card') as HTMLElement[]
-    cards.forEach((card, i) => {
-      gsap.from(card, {
-        y: 60, opacity: 0, scale: 0.97,
-        duration: 0.8, delay: i * 0.1,
-        ease: 'back.out(1.2)',
-        scrollTrigger: { trigger: card, start: 'top 88%' },
+    if (cards.length) {
+      gsap.set(cards, { opacity: 0, y: 60, scale: 0.97 })
+      ScrollTrigger.create({
+        trigger: cards[0],
+        start: 'top 92%',
+        once: true,
+        onEnter: () => {
+          gsap.to(cards, { opacity: 1, y: 0, scale: 1, duration: 0.7, stagger: 0.12, ease: 'back.out(1.2)' })
+        }
       })
-    })
+    }
   }, sectionRef.value)
+  ScrollTrigger.refresh()
 }
 
 onMounted(() => {
@@ -279,23 +257,27 @@ onMounted(() => {
 })
 
 watch(
-  [page, activeFilter],
-  () => { fetchCaseStudies() },
+  [activeFilter],
+  () => {
+    page.value = 1
+    caseStudyItems.value = []
+    fetchCaseStudies(false)
+  },
   { immediate: true }
 )
 
 onUnmounted(() => { ctx?.revert() })
 
-const paginationRange = computed(() => {
-  if (!caseStudies.value?.meta) return []
-  const total = caseStudies.value.meta.last_page
-  const current = page.value
-  const range = []
-  for (let i = Math.max(1, current - 2); i <= Math.min(total, current + 2); i++) {
-    range.push(i)
-  }
-  return range
+const hasMore = computed(() => {
+  if (!paginationMeta.value) return false
+  return paginationMeta.value.current_page < paginationMeta.value.last_page
 })
+
+const loadMore = async () => {
+  if (!hasMore.value || loadingMore.value) return
+  page.value += 1
+  await fetchCaseStudies(true)
+}
 
 const getResults = (caseStudy: CaseStudy) => {
   if (!caseStudy?.results) return []

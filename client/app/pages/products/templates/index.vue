@@ -15,7 +15,7 @@
       </nav>
     </div>
 
-    <ProductListPage type="template" title="Premium Templates" subtitle="Beautiful, production-ready templates for your next project built with modern technologies" />
+    <ProductListPage type="downloadable" title="Premium Templates" subtitle="Beautiful, production-ready templates for your next project built with modern technologies" />
   </div>
 </template>
 

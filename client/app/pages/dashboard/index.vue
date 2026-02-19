@@ -1,333 +1,341 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { resolveApiError } from '~/app/utils/api-error'
-import type { ApiResponse, DownloadLinkResponse, FeatureFlags, LicenseDashboardPayload, LicenseSummary } from '~/types/api'
+import { computed, ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { resolveApiError } from '~/utils/api-error'
+import type { LicenseDashboardPayload } from '~/types/api'
+import gsap from 'gsap'
 
 definePageMeta({
+  layout: 'dashboard',
   middleware: ['$auth'],
-  title: 'Account Dashboard'
+  title: 'Dashboard Overview'
 })
 
-const config = useRuntimeConfig()
 const { user } = useSanctum()
 
 const {
-  data: licensePayload,
-  pending: licensePending,
-  error: licensesError,
-  refresh: refreshLicenses
-} = await useAsyncData('dashboard-licenses', () =>
-  useSanctumFetch<ApiResponse<LicenseDashboardPayload>>('/api/licenses', { method: 'GET' })
-    .then((response) => response.data)
+  data: payload,
+  pending,
+  error
+} = await useAsyncData(
+  'dashboard-overview',
+  () => useSanctumFetch<LicenseDashboardPayload>('/api/licenses', {
+    method: 'GET',
+    query: { type: 'all', per_page: 6, page: 1 }
+  })
 )
 
-const licenses = computed(() => licensePayload.value?.data ?? [])
-const downloads = computed(() => licenses.value.filter((license) => license.product.type === 'downloadable'))
-const apiSubscriptions = computed(() => licenses.value.filter((license) => license.product.type === 'api_service'))
-const featureFlags = computed<FeatureFlags>(() => licensePayload.value?.feature_flags ?? {
-  downloads_enabled: true,
-  api_access_enabled: true,
-  licensing_enabled: true
+const licenses = computed(() => payload.value?.data ?? [])
+const paidDownloads = computed(() => licenses.value.filter((item) => item.product.type === 'downloadable').length)
+const apiSubscriptions = computed(() => licenses.value.filter((item) => ['api_service', 'api_referral'].includes(item.product.type)).length)
+const fetchError = computed(() => (error.value ? resolveApiError(error.value, 'Unable to load dashboard overview.') : null))
+
+// License breakdown for donut chart
+const licenseBreakdown = computed(() => {
+  const downloads = licenses.value.filter(l => l.product.type === 'downloadable').length
+  const apis = licenses.value.filter(l => ['api_service', 'api_referral'].includes(l.product.type)).length
+  const other = licenses.value.length - downloads - apis
+  const segments = []
+  if (downloads > 0) segments.push({ value: downloads, color: '#DC2626', label: 'Downloads' })
+  if (apis > 0) segments.push({ value: apis, color: '#059669', label: 'API Services' })
+  if (other > 0) segments.push({ value: other, color: '#2563EB', label: 'Other' })
+  if (segments.length === 0) segments.push({ value: 1, color: '#6B7280', label: 'No licenses' })
+  return segments
 })
 
-const licenseFetchError = computed(() => (licensesError ? resolveApiError(licensesError, 'Unable to load dashboard data.') : null))
+const downloadSparkline = computed(() =>
+  licenses.value
+    .filter((item) => item.product.type === 'downloadable')
+    .slice(0, 12)
+    .map((item) => item.usage_count || 0)
+)
 
-const downloadingSlug = ref<string | null>(null)
-const downloadError = ref<string | null>(null)
-const licenseCopyMessage = ref<string | null>(null)
+const apiSparkline = computed(() =>
+  licenses.value
+    .filter((item) => ['api_service', 'api_referral'].includes(item.product.type))
+    .slice(0, 12)
+    .map((item) => item.usage_count || 0)
+)
 
-const downloadLicense = async (license: LicenseSummary) => {
-  if (!license.product.slug) {
-    return
+const referralSparkline = computed(() => Array(12).fill(0))
+
+const monthlyActivity = computed(() => {
+  const now = new Date()
+  const monthMap = new Map<string, number>()
+
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    const key = d.toISOString().slice(0, 7)
+    monthMap.set(key, 0)
   }
 
-  downloadError.value = null
-  downloadingSlug.value = license.product.slug
-  try {
-    const response = await useSanctumFetch<ApiResponse<DownloadLinkResponse>>(`/api/products/${license.product.slug}/download`, {
-      method: 'POST'
-    })
-    const url = response?.data?.download_url
-    if (url && process.client) {
-      window.open(url, '_blank')
+  for (const license of licenses.value) {
+    if (!license.created_at) continue
+    const key = String(license.created_at).slice(0, 7)
+    if (monthMap.has(key)) {
+      monthMap.set(key, (monthMap.get(key) ?? 0) + 1)
     }
-  } catch (error: unknown) {
-    downloadError.value = resolveApiError(error, 'Unable to generate the download link.')
-  } finally {
-    downloadingSlug.value = null
   }
-}
 
-const copyKeyPrefix = async (license: LicenseSummary) => {
-  const value = license.api_key?.key_prefix
-  if (!value) {
-    return
-  }
-  try {
-    if (process.client && navigator.clipboard) {
-      await navigator.clipboard.writeText(value)
-      licenseCopyMessage.value = 'Key prefix copied'
+  return Array.from(monthMap.entries()).map(([key, value]) => {
+    const [year, month] = key.split('-').map(Number)
+    const label = new Date(year, month - 1, 1).toLocaleString('en-US', { month: 'short' })
+    return { label, value }
+  })
+})
+
+const recentActivity = computed(() =>
+  licenses.value.slice(0, 4).map((license) => {
+    const isApi = ['api_service', 'api_referral'].includes(license.product.type)
+    return {
+      icon: isApi ? 'lucide:cloud-cog' : 'lucide:download',
+      title: isApi ? 'API license active' : 'Download license active',
+      description: license.product.title,
+      time: license.created_at ? new Date(license.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently',
+      color: isApi
+        ? 'bg-emerald-100 dark:bg-emerald-900/30 ring-emerald-200 dark:ring-emerald-800'
+        : 'bg-mintreu-red-100 dark:bg-mintreu-red-900/30 ring-mintreu-red-200 dark:ring-mintreu-red-800'
     }
-  } catch {
-    licenseCopyMessage.value = 'Unable to copy'
-  } finally {
-    setTimeout(() => {
-      licenseCopyMessage.value = null
-    }, 1600)
-  }
+  })
+)
+
+// GSAP animations
+const overviewRef = ref<HTMLElement | null>(null)
+let ctx: gsap.Context | null = null
+
+const initAnimations = () => {
+  if (!overviewRef.value) return
+  ctx = gsap.context(() => {
+    // Stat cards
+    const statCards = gsap.utils.toArray('.stat-card-anim') as HTMLElement[]
+    if (statCards.length) {
+      gsap.set(statCards, { opacity: 0, y: 30, scale: 0.95 })
+      gsap.to(statCards, { opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.1, ease: 'back.out(1.3)', delay: 0.1 })
+    }
+
+    // Chart cards
+    const chartCards = gsap.utils.toArray('.chart-card-anim') as HTMLElement[]
+    if (chartCards.length) {
+      gsap.set(chartCards, { opacity: 0, y: 40 })
+      gsap.to(chartCards, { opacity: 1, y: 0, duration: 0.7, stagger: 0.15, ease: 'power3.out', delay: 0.5 })
+    }
+
+    // Action + timeline cards
+    const bottomCards = gsap.utils.toArray('.bottom-card-anim') as HTMLElement[]
+    if (bottomCards.length) {
+      gsap.set(bottomCards, { opacity: 0, y: 30 })
+      gsap.to(bottomCards, { opacity: 1, y: 0, duration: 0.6, stagger: 0.12, ease: 'power2.out', delay: 0.8 })
+    }
+
+    // Records section
+    const recordsSection = overviewRef.value?.querySelector('.records-anim')
+    if (recordsSection) {
+      gsap.set(recordsSection, { opacity: 0, y: 30 })
+      gsap.to(recordsSection, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 1.0 })
+    }
+  }, overviewRef.value)
 }
 
-const monthlyUsagePercent = (license: LicenseSummary): number => {
-  const limit = license.plan?.requests_per_month ?? license.api_key?.plan?.requests_per_month
-  const used = license.api_key?.requests_this_month ?? 0
-  if (!limit || limit <= 0) {
-    return 0
-  }
-  return Math.min(100, Math.round((used / limit) * 100))
-}
+onMounted(() => {
+  nextTick(() => { setTimeout(initAnimations, 50) })
+})
 
-const downloadUsagePercent = (license: LicenseSummary): number => {
-  if (!license.max_usage) {
-    return 0
-  }
-  return Math.min(100, Math.round((license.usage_count / license.max_usage) * 100))
-}
-
-const formatDate = (value?: string | null) => {
-  if (!value) {
-    return 'N/A'
-  }
-  return new Date(value).toLocaleDateString()
-}
-
-const statusLabels: Record<string, string> = {
-  active: 'Active',
-  expired: 'Expired',
-  disabled: 'Disabled',
-  usage_limit: 'Usage limit reached'
-}
-
-const statusClasses: Record<string, string> = {
-  active: 'bg-emerald-50 border border-emerald-200 text-emerald-700',
-  expired: 'bg-amber-50 border border-amber-200 text-amber-700',
-  disabled: 'bg-slate-100 border border-slate-200 text-slate-600',
-  usage_limit: 'bg-rose-50 border border-rose-200 text-rose-700'
-}
-
-const flagLabels: Record<keyof FeatureFlags, string> = {
-  downloads_enabled: 'Downloads',
-  api_access_enabled: 'API access',
-  licensing_enabled: 'Licensing guardrails'
-}
+onUnmounted(() => { ctx?.revert() })
 </script>
 
 <template>
-  <div class="min-h-screen bg-titanium-50 dark:bg-titanium-950 py-10">
-    <div class="max-w-7xl mx-auto px-4 space-y-6">
-      <section class="bg-white dark:bg-titanium-900/80 border border-titanium-200 dark:border-titanium-800 rounded-3xl p-6 space-y-4 shadow-sm">
-        <div class="flex flex-col gap-4">
-          <div>
-            <p class="text-[10px] uppercase tracking-[0.6em] text-titanium-500">Account dashboard</p>
-            <h1 class="text-3xl lg:text-4xl font-heading font-black text-titanium-900 dark:text-white">Paid downloads &amp; API keys</h1>
-            <p class="text-sm text-titanium-500 dark:text-titanium-400">Monitor your purchased downloads, licenses, and API subscriptions in one guarded view.</p>
+  <div ref="overviewRef">
+    <!-- Page Header -->
+    <div>
+      <h1 class="text-2xl font-heading font-black text-titanium-900 dark:text-white">Dashboard overview</h1>
+      <p class="text-sm text-titanium-500 dark:text-titanium-400 mt-1">Manage your products, API subscriptions, and account settings.</p>
+    </div>
+
+    <!-- Stats Row with Three.js Background -->
+    <div class="relative rounded-2xl overflow-hidden">
+      <!-- Three.js ambient background -->
+      <div class="absolute inset-0 z-0 opacity-60">
+        <ClientOnly>
+          <TresCanvas :clear-color="'transparent'" :alpha="true" window-size style="height: 100% !important; position: absolute; inset: 0;">
+            <TresPerspectiveCamera :position="[0, 0, 6]" :fov="50" />
+            <ThreeDashboardParticles :count="20" color="#DC2626" :speed="0.3" />
+            <ThreeDashboardParticles :count="15" color="#6B7280" :speed="0.2" />
+          </TresCanvas>
+        </ClientOnly>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-1">
+        <div class="stat-card-anim">
+          <DashboardStatCard
+            label="Account"
+            :value="user?.value?.name ?? 'Client'"
+            icon="lucide:user-circle"
+            color="titanium"
+            :subtitle="user?.value?.email ?? ''"
+          />
+        </div>
+        <div class="stat-card-anim">
+          <DashboardStatCard
+            label="Paid downloads"
+            :value="paidDownloads"
+            icon="lucide:download"
+            color="red"
+            subtitle="Licensed products"
+            :sparkline-data="downloadSparkline"
+            :trend="{ value: 12, direction: 'up' }"
+          />
+        </div>
+        <div class="stat-card-anim">
+          <DashboardStatCard
+            label="API subscriptions"
+            :value="apiSubscriptions"
+            icon="lucide:cloud-cog"
+            color="emerald"
+            subtitle="Active services"
+            :sparkline-data="apiSparkline"
+            :trend="{ value: 8, direction: 'up' }"
+          />
+        </div>
+        <div class="stat-card-anim">
+          <DashboardStatCard
+            label="Referral earnings"
+            :value="0"
+            icon="lucide:share-2"
+            color="amber"
+            subtitle="Total earned"
+            :sparkline-data="referralSparkline"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+      <!-- Monthly Activity -->
+      <div class="chart-card-anim lg:col-span-3">
+        <DashboardDashboardCard title="Monthly activity" subtitle="License & API usage over time">
+          <div class="flex items-end justify-center py-2 overflow-x-auto">
+            <DashboardMiniBarChart
+              :data="monthlyActivity"
+              color="#DC2626"
+              :height="160"
+            />
           </div>
+        </DashboardDashboardCard>
+      </div>
+
+      <!-- License Breakdown -->
+      <div class="chart-card-anim lg:col-span-2">
+        <DashboardDashboardCard title="License breakdown" subtitle="By product type">
+          <div class="flex items-center justify-center py-2">
+            <DashboardMiniDonut
+              :segments="licenseBreakdown"
+              :size="150"
+              :thickness="22"
+            />
+          </div>
+        </DashboardDashboardCard>
+      </div>
+    </div>
+
+    <!-- Quick Actions + Activity Timeline -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <!-- Quick Actions -->
+      <div class="bottom-card-anim">
+        <DashboardDashboardCard title="Quick actions">
           <div class="flex flex-wrap gap-3">
-            <NuxtLink to="/contact" class="px-4 py-2 bg-mintreu-red-600 text-white rounded-2xl text-sm font-semibold">Contact support</NuxtLink>
-            <NuxtLink to="/auth/forgot-password" class="px-4 py-2 border border-titanium-200 rounded-2xl text-sm font-semibold text-titanium-700">Reset password</NuxtLink>
-            <NuxtLink to="/products" class="px-4 py-2 bg-slate-100 rounded-2xl text-sm font-semibold text-titanium-700">Browse products</NuxtLink>
+            <NuxtLink
+              to="/dashboard/licenses"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-mintreu-red-600 text-white text-sm font-semibold hover:bg-mintreu-red-700 transition-colors"
+            >
+              <Icon name="lucide:key-round" class="w-4 h-4" />
+              Licenses
+            </NuxtLink>
+            <NuxtLink
+              to="/dashboard/apis"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-titanium-200 dark:border-titanium-700 text-sm font-semibold text-titanium-700 dark:text-titanium-300 hover:bg-titanium-100 dark:hover:bg-titanium-800 transition-colors"
+            >
+              <Icon name="lucide:cloud-cog" class="w-4 h-4" />
+              API Subscriptions
+            </NuxtLink>
+            <NuxtLink
+              to="/dashboard/spaces"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-titanium-200 dark:border-titanium-700 text-sm font-semibold text-titanium-700 dark:text-titanium-300 hover:bg-titanium-100 dark:hover:bg-titanium-800 transition-colors"
+            >
+              <Icon name="lucide:globe" class="w-4 h-4" />
+              Manage Spaces
+            </NuxtLink>
+            <NuxtLink
+              to="/dashboard/referrals"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-titanium-200 dark:border-titanium-700 text-sm font-semibold text-titanium-700 dark:text-titanium-300 hover:bg-titanium-100 dark:hover:bg-titanium-800 transition-colors"
+            >
+              <Icon name="lucide:share-2" class="w-4 h-4" />
+              Referrals
+            </NuxtLink>
+            <NuxtLink
+              to="/dashboard/profile"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-titanium-200 dark:border-titanium-700 text-sm font-semibold text-titanium-700 dark:text-titanium-300 hover:bg-titanium-100 dark:hover:bg-titanium-800 transition-colors"
+            >
+              <Icon name="lucide:user-cog" class="w-4 h-4" />
+              Profile & Security
+            </NuxtLink>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-            <div class="p-4 bg-titanium-100 dark:bg-titanium-800/60 rounded-2xl border border-titanium-200 dark:border-titanium-800">
-              <p class="text-xs uppercase text-titanium-500">Logged in as</p>
-              <p class="font-semibold text-titanium-900 dark:text-white">{{ user?.value?.name ?? 'Client Demo' }}</p>
-              <p class="text-titanium-500 dark:text-titanium-400">{{ user?.value?.email }}</p>
-            </div>
-            <div class="p-4 bg-titanium-100 dark:bg-titanium-800/60 rounded-2xl border border-titanium-200 dark:border-titanium-800">
-              <p class="text-xs uppercase text-titanium-500">Paid downloads</p>
-              <p class="text-2xl font-bold text-mintreu-red-600">{{ downloads.length }}</p>
-            </div>
-            <div class="p-4 bg-titanium-100 dark:bg-titanium-800/60 rounded-2xl border border-titanium-200 dark:border-titanium-800">
-              <p class="text-xs uppercase text-titanium-500">API subscriptions</p>
-              <p class="text-2xl font-bold text-emerald-600">{{ apiSubscriptions.length }}</p>
-            </div>
-          </div>
-          <div v-if="licenseFetchError" class="rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 text-sm">
-            {{ licenseFetchError }}
-          </div>
-        </div>
-      </section>
+        </DashboardDashboardCard>
+      </div>
 
-      <section class="bg-white dark:bg-titanium-900/80 border border-titanium-200 dark:border-titanium-800 rounded-3xl p-6 shadow-sm space-y-4">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <div>
-            <p class="text-[10px] uppercase tracking-[0.6em] text-titanium-500">Licensed downloads</p>
-            <h2 class="text-2xl font-heading font-bold text-titanium-900 dark:text-white">One-time purchases</h2>
-            <p class="text-sm text-titanium-500 dark:text-titanium-400">Download the software you already own and keep an eye on limits.</p>
-          </div>
-          <div class="flex gap-3">
-            <button class="px-4 py-2 text-sm font-semibold border border-titanium-200 rounded-2xl" type="button" @click="refreshLicenses()">Refresh</button>
-            <NuxtLink to="/products" class="px-4 py-2 text-sm font-semibold bg-mintreu-red-600 text-white rounded-2xl">View store</NuxtLink>
-          </div>
-        </div>
+      <!-- Recent Activity -->
+      <div class="bottom-card-anim">
+        <DashboardDashboardCard title="Recent activity" subtitle="Latest account events">
+          <DashboardActivityTimeline :items="recentActivity" />
+        </DashboardDashboardCard>
+      </div>
+    </div>
 
-        <div v-if="licensePending" class="space-y-3 mt-4">
-          <div v-for="s in 2" :key="s" class="h-40 rounded-2xl bg-slate-100 animate-pulse"></div>
+    <!-- Recent Records -->
+    <div class="records-anim">
+      <DashboardDashboardCard title="Recent records">
+        <div v-if="fetchError" class="rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 px-4 py-3 text-sm">
+          {{ fetchError }}
         </div>
-
-        <div v-else-if="downloads.length === 0" class="mt-4 rounded-2xl border border-dashed border-titanium-200 dark:border-titanium-800 bg-titanium-100 dark:bg-titanium-900/50 px-5 py-6 text-sm text-titanium-600">
-          <p>You haven't purchased any downloadable assets yet. Start with a flagship template and the license will appear here.</p>
-          <NuxtLink to="/products" class="inline-flex mt-3 text-sm font-semibold text-mintreu-red-600">Browse paid downloads ?</NuxtLink>
-        </div>
-
-        <div v-else class="space-y-4 mt-4">
-          <article v-for="license in downloads" :key="license.id" class="space-y-4 rounded-3xl border border-titanium-200 dark:border-titanium-800 bg-titanium-50 dark:bg-titanium-900/60 p-4">
-            <div class="flex flex-col sm:flex-row justify-between gap-3">
-              <div>
-                <p class="text-lg font-semibold text-titanium-900 dark:text-white">{{ license.product.title }}</p>
-                <p class="text-sm text-titanium-500 dark:text-titanium-400">{{ license.product.short_description ?? 'No description available.' }}</p>
-              </div>
-              <span :class="['px-3 py-1 rounded-full text-xs font-semibold', statusClasses[license.status] ?? 'bg-slate-100 border border-slate-200 text-slate-600']">
-                {{ statusLabels[license.status] ?? license.status }}
-              </span>
-            </div>
-            <div class="flex flex-wrap gap-3 text-xs text-titanium-500 dark:text-titanium-400">
-              <span>Version {{ license.product.version ?? 'latest' }}</span>
-              <span>Downloads {{ license.product.engagement.downloads }}</span>
-              <span>Rating {{ (license.product.engagement.rating ?? 0).toFixed(1) }}</span>
-            </div>
-            <div class="flex flex-wrap gap-3 mt-4">
-              <button
-                class="px-4 py-2 rounded-2xl bg-mintreu-red-600 text-white text-sm font-semibold"
-                type="button"
-                :disabled="downloadingSlug === license.product.slug"
-                @click="downloadLicense(license)"
-              >
-                <span v-if="downloadingSlug === license.product.slug">Preparing…</span>
-                <span v-else>Download latest build</span>
-              </button>
-              <NuxtLink
-                v-if="license.product.documentation_url"
-                :href="license.product.documentation_url"
-                target="_blank"
-                rel="noreferrer"
-                class="px-4 py-2 rounded-2xl border border-titanium-200 text-sm font-semibold text-titanium-700"
-              >
-                Documentation
-              </NuxtLink>
-              <span class="text-xs text-titanium-500 dark:text-titanium-400">Expires {{ formatDate(license.expires_at) }}</span>
-            </div>
-            <div class="mt-4 space-y-2">
-              <div
-                v-for="source in license.download_sources"
-                :key="source.id"
-                class="flex items-start justify-between gap-3 p-3 bg-white dark:bg-titanium-900 border border-titanium-200 dark:border-titanium-800 rounded-2xl"
-              >
-                <div>
-                  <p class="font-semibold text-titanium-900 dark:text-white">{{ source.name }}</p>
-                  <p class="text-xs text-titanium-500 dark:text-titanium-400">{{ source.provider_label }} · {{ source.version ?? 'latest' }}</p>
-                </div>
-                <div class="text-right text-xs text-titanium-500 dark:text-titanium-400">
-                  <p>{{ source.file_name ?? 'package' }}</p>
-                  <p v-if="source.file_size_formatted">{{ source.file_size_formatted }}</p>
-                </div>
-              </div>
-            </div>
-            <div class="text-xs text-titanium-500 dark:text-titanium-400">
-              Usage: {{ license.usage_count }}{{ license.max_usage ? ` / ${license.max_usage}` : '' }}
-            </div>
-            <div class="mt-1 h-1.5 rounded-full bg-slate-100 dark:bg-titanium-800">
-              <div class="h-full rounded-full bg-mintreu-red-600" :style="{ width: `${downloadUsagePercent(license)}%` }"></div>
-            </div>
-          </article>
-        </div>
-
-        <div v-if="downloadError" class="rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 text-sm">
-          {{ downloadError }}
-        </div>
-      </section>
-
-      <section class="bg-white dark:bg-titanium-900/80 border border-titanium-200 dark:border-titanium-800 rounded-3xl p-6 shadow-sm space-y-4">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <div>
-            <p class="text-[10px] uppercase tracking-[0.6em] text-titanium-500">API subscriptions</p>
-            <h2 class="text-2xl font-heading font-bold text-titanium-900 dark:text-white">Active API plans</h2>
-            <p class="text-sm text-titanium-500 dark:text-titanium-400">Track API keys, usage, and renewal dates for your SaaS access.</p>
-          </div>
-          <div class="flex gap-3">
-            <button class="px-4 py-2 text-sm font-semibold border border-titanium-200 rounded-2xl" type="button" @click="refreshLicenses()">Refresh</button>
-            <NuxtLink to="/contact" class="px-4 py-2 bg-slate-100 rounded-2xl text-sm font-semibold text-titanium-700">Need help?</NuxtLink>
-          </div>
-        </div>
-
-        <div v-if="licensePending" class="space-y-3 mt-4">
-          <div v-for="s in 2" :key="`api-${s}`" class="h-48 rounded-2xl bg-slate-100 animate-pulse"></div>
-        </div>
-
-        <div v-else-if="apiSubscriptions.length === 0" class="mt-4 rounded-2xl border border-dashed border-titanium-200 dark:border-titanium-800 bg-titanium-100 dark:bg-titanium-900/50 px-5 py-6 text-sm text-titanium-600">
-          <p>You don't have any active API subscriptions yet. Purchase a plan to unlock rate-limited endpoints.</p>
-          <NuxtLink to="/products" class="inline-flex mt-3 text-sm font-semibold text-mintreu-red-600">Explore integrations ?</NuxtLink>
-        </div>
-
-        <div v-else class="grid gap-4 md:grid-cols-2 mt-4">
-          <article v-for="license in apiSubscriptions" :key="license.id" class="space-y-4 rounded-3xl border border-titanium-200 dark:border-titanium-800 bg-titanium-50 dark:bg-titanium-900/60 p-4">
-            <div class="flex items-start justify-between gap-3">
-              <div>
-                <p class="text-lg font-semibold text-titanium-900 dark:text-white">{{ license.product.title }}</p>
-                <p class="text-xs text-titanium-500 dark:text-titanium-400">{{ license.plan?.name ?? 'API Subscription' }}</p>
-              </div>
-              <span class="text-xs uppercase tracking-[0.3em] text-titanium-500">{{ license.plan?.price_formatted ?? '$' }}</span>
-            </div>
-            <div class="space-y-2">
-              <div class="flex items-center justify-between text-xs text-titanium-500 dark:text-titanium-400">
-                <span>API key</span>
-                <span>{{ license.api_key?.environment ?? 'prod' }}</span>
-              </div>
-              <div class="flex items-center justify-between gap-3 border border-titanium-200 dark:border-titanium-800 rounded-2xl bg-white dark:bg-titanium-900/40 px-4 py-3">
-                <p class="font-mono text-sm text-titanium-900 dark:text-white">{{ license.api_key?.key_prefix ?? '••••••••••••' }}</p>
-                <button type="button" class="text-xs font-semibold text-mintreu-red-600" @click="copyKeyPrefix(license)">Copy prefix</button>
-              </div>
-              <p v-if="licenseCopyMessage" class="text-xs text-emerald-600">{{ licenseCopyMessage }}</p>
-            </div>
-            <div class="space-y-2">
-              <div class="flex items-center justify-between text-xs text-titanium-500 dark:text-titanium-400">
-                <span>Monthly usage</span>
-                <span>{{ license.api_key?.requests_this_month ?? 0 }} / {{ license.plan?.requests_per_month ?? '8' }}</span>
-              </div>
-              <div class="h-2 rounded-full bg-slate-100 dark:bg-titanium-800">
-                <div class="h-full rounded-full bg-emerald-500" :style="{ width: `${monthlyUsagePercent(license)}%` }"></div>
-              </div>
-              <div class="text-xs text-titanium-500 dark:text-titanium-400">
-                Next renewal: {{ formatDate(license.next_renewal_at) }}
-              </div>
-            </div>
-            <div class="flex flex-wrap gap-3">
-              <button class="px-4 py-2 text-sm font-semibold border border-titanium-200 rounded-2xl" type="button">Regenerate key</button>
-              <NuxtLink to="/contact" class="px-4 py-2 text-sm font-semibold bg-slate-100 rounded-2xl text-titanium-700">Request domain change</NuxtLink>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="bg-white dark:bg-titanium-900/80 border border-titanium-200 dark:border-titanium-800 rounded-3xl p-6 shadow-sm space-y-4">
-        <div>
-          <p class="text-[10px] uppercase tracking-[0.6em] text-titanium-500">System status</p>
-          <h2 class="text-2xl font-heading font-bold text-titanium-900 dark:text-white">Kill switch overview</h2>
-          <p class="text-sm text-titanium-500 dark:text-titanium-400">Feature flags guard payments, downloads, licensing, and API access.</p>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div
-            v-for="(value, key) in featureFlags"
-            :key="key"
-            class="p-4 rounded-3xl border border-titanium-200 dark:border-titanium-800 bg-titanium-50 dark:bg-titanium-900/60 space-y-1"
+        <DashboardSkeletonLoader v-else-if="pending" variant="row" :count="3" />
+        <DashboardEmptyState
+          v-else-if="licenses.length === 0"
+          title="No records yet"
+          description="Your purchased licenses and subscriptions will appear here."
+          action-label="Browse Products"
+          action-to="/products"
+        />
+        <div v-else class="space-y-3">
+          <article
+            v-for="license in licenses.slice(0, 3)"
+            :key="license.id"
+            class="rounded-xl border border-titanium-200 dark:border-titanium-700 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 hover:border-titanium-300 dark:hover:border-titanium-600 transition-colors"
           >
-            <p class="text-xs uppercase tracking-[0.5em] text-titanium-500">{{ flagLabels[key as keyof FeatureFlags] }}</p>
-            <p class="text-xl font-semibold text-titanium-900 dark:text-white">{{ value ? 'Enabled' : 'Disabled' }}</p>
-            <p class="text-xs text-titanium-500">Kill switch {{ value ? 'open' : 'closed' }}</p>
-          </div>
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-10 h-10 rounded-lg bg-titanium-100 dark:bg-titanium-800 flex items-center justify-center flex-shrink-0">
+                <Icon
+                  :name="['api_service', 'api_referral'].includes(license.product.type) ? 'lucide:cloud-cog' : 'lucide:download'"
+                  class="w-5 h-5 text-titanium-500 dark:text-titanium-400"
+                />
+              </div>
+              <div class="min-w-0">
+                <p class="font-semibold text-titanium-900 dark:text-white truncate">{{ license.product.title }}</p>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <span class="text-xs text-titanium-500 dark:text-titanium-400">{{ license.type_label }}</span>
+                  <DashboardStatusBadge :status="license.status" />
+                </div>
+              </div>
+            </div>
+            <NuxtLink
+              :to="`/dashboard/licenses/${license.id}`"
+              class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-titanium-900 dark:bg-titanium-700 text-white text-xs font-semibold hover:bg-titanium-800 dark:hover:bg-titanium-600 transition-colors flex-shrink-0"
+            >
+              View
+              <Icon name="lucide:arrow-right" class="w-3.5 h-3.5" />
+            </NuxtLink>
+          </article>
         </div>
-        <p class="text-xs text-titanium-500">Need a full audit trail? Reach us at <a class="text-mintreu-red-600" :href="`mailto:${config.public.supportEmail}`">{{ config.public.supportEmail }}</a>.</p>
-      </section>
+      </DashboardDashboardCard>
     </div>
   </div>
 </template>
-

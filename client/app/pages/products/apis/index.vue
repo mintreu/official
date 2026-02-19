@@ -15,7 +15,7 @@
       </nav>
     </div>
 
-    <ProductListPage type="api" title="API Subscriptions" subtitle="Production-ready APIs with reliable uptime and comprehensive documentation" />
+    <ProductListPage type="api_service" title="API Subscriptions" subtitle="Production-ready APIs with reliable uptime and comprehensive documentation" />
   </div>
 </template>
 

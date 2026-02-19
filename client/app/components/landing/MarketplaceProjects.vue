@@ -14,111 +14,6 @@ const fetchError = ref<Error | null>(null)
 let ctx: gsap.Context | null = null
 const { getProducts } = useApi()
 
-const showcaseProducts: Product[] = [
-  {
-    slug: 'laravel-saas-starter',
-    title: 'Laravel SaaS Starter Kit',
-    description: 'Production-ready SaaS boilerplate with multi-tenancy, Stripe billing, role-based access, and admin dashboard. Ships with 50+ tests.',
-    image: '',
-    price: 149,
-    category: 'Starter Kit',
-    type: 'template',
-    version: '2.4.0',
-    downloads: 1200,
-    rating: 4.9,
-    status: 'published',
-    featured: true,
-    content: '', excerpt: '', id: 0,
-    created_at: '2025-06-01T00:00:00Z',
-    updated_at: '2025-06-01T00:00:00Z',
-  },
-  {
-    slug: 'rest-api-boilerplate',
-    title: 'REST API Boilerplate',
-    description: 'Enterprise API starter with authentication, rate limiting, versioning, OpenAPI docs, and comprehensive test suite built on Laravel.',
-    image: '',
-    price: 79,
-    category: 'Backend',
-    type: 'template',
-    version: '3.1.0',
-    downloads: 2100,
-    rating: 4.8,
-    status: 'published',
-    featured: true,
-    content: '', excerpt: '', id: 0,
-    created_at: '2025-04-15T00:00:00Z',
-    updated_at: '2025-04-15T00:00:00Z',
-  },
-  {
-    slug: 'ai-chatbot-api',
-    title: 'AI Chatbot Integration API',
-    description: 'Plug-and-play AI chatbot API with GPT-4 integration, conversation memory, webhook support, and analytics dashboard.',
-    image: '',
-    price: 29,
-    category: 'AI/ML',
-    type: 'api',
-    version: '1.8.0',
-    downloads: 890,
-    rating: 4.7,
-    status: 'published',
-    featured: true,
-    content: '', excerpt: '', id: 0,
-    created_at: '2025-03-20T00:00:00Z',
-    updated_at: '2025-03-20T00:00:00Z',
-  },
-  {
-    slug: 'vue-admin-dashboard',
-    title: 'Vue Admin Dashboard',
-    description: 'Beautiful admin panel with 60+ components, dark mode, charts, data tables, form builders, and role-based navigation.',
-    image: '',
-    price: 99,
-    category: 'Frontend',
-    type: 'template',
-    version: '4.0.2',
-    downloads: 1800,
-    rating: 4.8,
-    status: 'published',
-    featured: true,
-    content: '', excerpt: '', id: 0,
-    created_at: '2025-02-10T00:00:00Z',
-    updated_at: '2025-02-10T00:00:00Z',
-  },
-  {
-    slug: 'payment-gateway-sdk',
-    title: 'Payment Gateway SDK',
-    description: 'Unified payment SDK supporting Stripe, Razorpay, PayPal, and Cashfree with automatic currency conversion and webhook handling.',
-    image: '',
-    price: 0,
-    category: 'Utility',
-    type: 'freebie',
-    version: '2.0.1',
-    downloads: 5200,
-    rating: 4.6,
-    status: 'published',
-    featured: true,
-    content: '', excerpt: '', id: 0,
-    created_at: '2025-01-05T00:00:00Z',
-    updated_at: '2025-01-05T00:00:00Z',
-  },
-  {
-    slug: 'nuxt-ecommerce-template',
-    title: 'Nuxt E-Commerce Template',
-    description: 'Full-featured e-commerce frontend with product catalog, cart, checkout, user accounts, and SEO optimization built on Nuxt 4.',
-    image: '',
-    price: 129,
-    category: 'E-Commerce',
-    type: 'template',
-    version: '1.5.0',
-    downloads: 950,
-    rating: 4.9,
-    status: 'published',
-    featured: true,
-    content: '', excerpt: '', id: 0,
-    created_at: '2024-12-15T00:00:00Z',
-    updated_at: '2024-12-15T00:00:00Z',
-  },
-]
-
 const formatPrice = (price: number) => {
   if (price === 0) return 'Free'
   return currency.value === 'USD' ? `$${price}` : `\u20B9${(price * 82).toFixed(0)}`
@@ -130,10 +25,10 @@ const loadProducts = async () => {
   try {
     const response = await getProducts({ featured: true, per_page: 6 }) as any
     const items = response?.data ?? []
-    productsResponse.value = items.length ? items : showcaseProducts
+    productsResponse.value = items
   } catch (error) {
-    fetchError.value = null
-    productsResponse.value = showcaseProducts
+    fetchError.value = error as Error
+    productsResponse.value = []
   } finally {
     pending.value = false
   }
@@ -257,8 +152,8 @@ onUnmounted(() => { ctx?.revert() })
                   class="px-3 py-1.5 backdrop-blur-xl border rounded-full text-white text-xs font-heading font-bold"
                   :class="{
                     'bg-green-600/80 border-green-500/30': product.price === 0,
-                    'bg-mintreu-red-600/80 border-mintreu-red-500/30': product.type === 'api',
-                    'bg-blueprint-600/80 border-blueprint-500/30': product.type === 'template' || product.type === 'plugin'
+                    'bg-mintreu-red-600/80 border-mintreu-red-500/30': ['api_service', 'api_referral'].includes(product.type),
+                    'bg-blueprint-600/80 border-blueprint-500/30': ['downloadable', 'demo'].includes(product.type)
                   }"
                 >
                   {{ product.price === 0 ? 'FREE' : (product.type || 'Product') }}
@@ -295,7 +190,7 @@ onUnmounted(() => { ctx?.revert() })
                   <div class="text-2xl font-heading font-black text-titanium-900 dark:text-white">
                     {{ formatPrice(product.price) }}
                   </div>
-                  <div v-if="product.type === 'api'" class="text-xs text-titanium-500 font-subheading">/month</div>
+                  <div v-if="['api_service', 'api_referral'].includes(product.type)" class="text-xs text-titanium-500 font-subheading">/month</div>
                   <div v-else-if="product.price > 0" class="text-xs text-titanium-500 font-subheading">one-time</div>
                 </div>
                 <button class="px-5 py-2.5 bg-mintreu-red-600 hover:bg-mintreu-red-700 text-white rounded-xl text-sm font-heading font-bold shadow-lg transform hover:scale-105 active:scale-95 transition-all duration-300">

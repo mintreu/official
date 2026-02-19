@@ -4,10 +4,11 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
-class CaseStudySeeder extends Seeder
+class ProductionProductSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call([ProductionCaseStudySeeder::class]);
+        $this->call([RevenuePortfolioSeeder::class]);
     }
 }
+

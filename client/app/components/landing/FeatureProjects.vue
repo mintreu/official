@@ -13,104 +13,16 @@ const error = ref<Error | null>(null)
 let ctx: gsap.Context | null = null
 const { getProjects } = useApi()
 
-const showcaseProjects: Project[] = [
-  {
-    slug: 'ecommerce-platform',
-    title: 'E-Commerce Platform',
-    description: 'Full-stack marketplace with real-time inventory, Stripe payments, and AI-powered product recommendations. Handles 10K+ concurrent users.',
-    image: '',
-    category: 'Web Application',
-    technologies: ['Laravel', 'Nuxt.js', 'Redis', 'Stripe'],
-    status: 'published',
-    featured: true,
-    created_at: '2025-08-15T00:00:00Z',
-    updated_at: '2025-08-15T00:00:00Z',
-    content: '',
-    id: 0,
-    live_url: '#',
-  },
-  {
-    slug: 'healthcare-management',
-    title: 'Healthcare Management System',
-    description: 'HIPAA-compliant patient portal with appointment scheduling, telemedicine integration, and real-time health monitoring dashboards.',
-    image: '',
-    category: 'Healthcare',
-    technologies: ['React', 'Node.js', 'PostgreSQL', 'Docker'],
-    status: 'published',
-    featured: true,
-    created_at: '2025-06-20T00:00:00Z',
-    updated_at: '2025-06-20T00:00:00Z',
-    content: '',
-    id: 0,
-  },
-  {
-    slug: 'fintech-mobile-app',
-    title: 'FinTech Mobile App',
-    description: 'Native Android banking app with biometric authentication, real-time transaction tracking, and investment portfolio management.',
-    image: '',
-    category: 'Mobile',
-    technologies: ['Kotlin', 'Firebase', 'TensorFlow', 'Razorpay'],
-    status: 'published',
-    featured: true,
-    created_at: '2025-04-10T00:00:00Z',
-    updated_at: '2025-04-10T00:00:00Z',
-    content: '',
-    id: 0,
-  },
-  {
-    slug: 'real-estate-portal',
-    title: 'Real Estate Portal',
-    description: 'Property listing platform with interactive 3D virtual tours, AI-powered price predictions, and automated document processing.',
-    image: '',
-    category: 'Web Application',
-    technologies: ['Laravel', 'Vue.js', 'Three.js', 'MySQL'],
-    status: 'published',
-    featured: true,
-    created_at: '2025-02-28T00:00:00Z',
-    updated_at: '2025-02-28T00:00:00Z',
-    content: '',
-    id: 0,
-  },
-  {
-    slug: 'ai-analytics-dashboard',
-    title: 'AI Analytics Dashboard',
-    description: 'Enterprise analytics platform processing 50M+ events daily with predictive insights, custom reporting, and real-time anomaly detection.',
-    image: '',
-    category: 'AI/ML',
-    technologies: ['Python', 'Next.js', 'TensorFlow', 'MongoDB'],
-    status: 'published',
-    featured: true,
-    created_at: '2025-01-15T00:00:00Z',
-    updated_at: '2025-01-15T00:00:00Z',
-    content: '',
-    id: 0,
-  },
-  {
-    slug: 'desktop-inventory-system',
-    title: 'Cross-Platform Desktop App',
-    description: 'Inventory management system for warehouses with barcode scanning, real-time sync, and offline-first architecture for Windows, macOS, and Linux.',
-    image: '',
-    category: 'Desktop',
-    technologies: ['Electron', 'React', 'SQLite', 'C++'],
-    status: 'published',
-    featured: true,
-    created_at: '2024-11-05T00:00:00Z',
-    updated_at: '2024-11-05T00:00:00Z',
-    content: '',
-    id: 0,
-  },
-]
-
 const loadProjects = async () => {
   pending.value = true
   error.value = null
   try {
     const response = await getProjects({ featured: true, per_page: 6 }) as any
     const items = response?.data ?? []
-    projects.value = items.length ? items : showcaseProjects
+    projects.value = items
   } catch (err) {
-    error.value = null
-    projects.value = showcaseProjects
+    error.value = err as Error
+    projects.value = []
   } finally {
     pending.value = false
   }
@@ -274,7 +186,7 @@ onUnmounted(() => { ctx?.revert() })
         </NuxtLink>
       </div>
 
-      <!-- Empty State (shouldn't reach due to showcase fallback) -->
+      <!-- Empty State -->
       <div v-else class="text-center py-12">
         <Icon name="lucide:folder-open" class="w-16 h-16 mx-auto mb-4 text-titanium-400" />
         <p class="text-titanium-600 dark:text-titanium-400 font-subheading">No projects available at the moment.</p>
