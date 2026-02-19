@@ -1,4 +1,4 @@
-# Shopcore Business Plan (API + Nuxt Packs)
+# Shopcore Business Plan (API + Nuxt Products)
 
 Date: 2026-02-19  
 Status: Go-live priority
@@ -20,10 +20,10 @@ We do not sell:
 ## 2) Product Lines
 
 1. `PulseCart Commerce Cloud API`
-2. `Velora Boutique Storefront Pack` (`client_boutique`)
-3. `PlayNest Toy Storefront Pack` (`client_toy`)
-4. `HavenHaus Furniture Storefront Pack` (`client_furniture`)
-5. `LunaMuse Women Storefront Pack` (`client_women`)
+2. `Velori Boutique` (`velori-boutique`)
+3. `Havena Home` (`havena-home`)
+4. `Lunera Divas` (`lunera-divas`)
+5. `... and 17 more commerce products` (see `production-product-catalog.md`)
 
 ---
 

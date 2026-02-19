@@ -154,7 +154,7 @@
                 </div>
                 <div v-else class="text-lg font-heading font-black text-titanium-900 dark:text-white">
                   {{ formatPrice(product.price) }}
-                  <span v-if="product.type === 'api'" class="text-xs text-titanium-500 font-subheading">/mo</span>
+                  <span v-if="product.type === 'api_service' || product.type === 'api_referral'" class="text-xs text-titanium-500 font-subheading">/mo</span>
                 </div>
 
                 <div class="flex items-center space-x-3 text-xs text-titanium-500 font-subheading">
@@ -172,7 +172,7 @@
               <button
                 class="w-full px-4 py-2.5 bg-mintreu-red-600 hover:bg-mintreu-red-700 text-white rounded-xl font-heading font-bold text-sm shadow-lg transform hover:scale-105 active:scale-95 transition-all duration-300"
               >
-                {{ product.price === 0 ? 'Download Free' : product.type === 'api' ? 'Start Free Trial' : 'View Details' }}
+                {{ product.price === 0 ? 'Download Free' : (product.type === 'api_service' || product.type === 'api_referral') ? 'Start Free Trial' : 'View Details' }}
               </button>
             </div>
           </div>

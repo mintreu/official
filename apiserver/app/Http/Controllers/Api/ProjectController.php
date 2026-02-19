@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProjectResource;
-use App\Models\Project;
+use App\Models\Content\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
@@ -16,7 +15,7 @@ class ProjectController extends Controller
         $search = $request->string('search')->toString();
         $category = $request->string('category')->toString();
         $sort = $request->string('sort')->toString() ?: 'latest';
-        $perPage = (int)($request->input('per_page', 9));
+        $perPage = (int) ($request->input('per_page', 9));
 
         $query = Project::query();
 
@@ -25,13 +24,13 @@ class ProjectController extends Controller
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%');
+                $q->where('title', 'like', '%'.$search.'%')
+                    ->orWhere('description', 'like', '%'.$search.'%');
             });
         }
 
         if ($category !== '' && $category !== 'All') {
-            $query->where('platform', 'like', '%' . $category . '%');
+            $query->where('category', 'like', '%'.$category.'%');
         }
 
         if ($sort === 'latest') {

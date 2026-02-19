@@ -1,4 +1,4 @@
-# Helpdesk SaaS Business Plan (API + Nuxt Agent UI)
+# Helpdesk SaaS Business Plan (API + Nuxt Products)
 
 Date: 2026-02-19  
 Status: Phase-2 product
@@ -9,7 +9,7 @@ Status: Phase-2 product
 
 Sellable:
 1. Hosted Helpdesk API subscription
-2. Nuxt helpdesk frontend pack (agent panel + customer portal)
+2. Nuxt helpdesk frontend products (agent panel + customer portal + admin)
 
 Not sellable:
 1. Backend source code distribution
@@ -44,7 +44,6 @@ Not sellable:
 ## 5) Build Sequence
 
 1. API essentials (tickets, replies, statuses, SLA rules)
-2. Nuxt frontend pack (agent dashboard + customer ticket screen)
+2. Nuxt product lineup (ticket, message, live chat, AI assist, vertical support variants)
 3. Official listing + pricing + trial funnel
 4. Basic analytics + usage-based upsell triggers
-

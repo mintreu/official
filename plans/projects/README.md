@@ -22,3 +22,5 @@ Core rule:
 2. `./helpdesk-saas-business-plan.md`
 3. `./licenseops-business-plan.md`
 4. `./shopcore-category-locked-frontend-plan.md`
+5. `./production-product-catalog.md`
+6. `./official-to-child-plan-propagation.md`

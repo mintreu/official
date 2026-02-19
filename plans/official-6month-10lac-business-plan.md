@@ -1,40 +1,50 @@
-# Official 6-Month 10 Lakh Business Plan
+# Official 6-Month 10 Lakh Execution Plan
 
 Date: 2026-02-19  
-Owner: Founder + execution via Official platform
+Owner: Mintreu Official (mothership)
 
----
+## Quick Navigation
+1. [Operating Model](#operating-model)
+2. [Plan Governance Model](#plan-governance-model)
+3. [Revenue Target Breakdown](#revenue-target-breakdown)
+4. [Launch Week Operating Playbook](#launch-week-operating-playbook)
+5. [Offer and Promotion Framework](#offer-and-promotion-framework)
+6. [Project Pipeline and Product Expansion](#project-pipeline-and-product-expansion)
+7. [Weekly KPI Scoreboard](#weekly-kpi-scoreboard)
 
-## 1) Core Business Model
+## Operating Model
+1. `official` sells and distributes all products.
+2. Customer buys:
+   - API subscription (recurring)
+   - Nuxt frontend product (one-time)
+3. Backend source code is never sold.
+4. One API powers many differentiated frontend products.
+5. Portfolio must show only real build-and-sell products.
 
-1. Sell API subscription as recurring product.
-2. Sell premade Nuxt frontend templates as separate one-time products.
-3. One API can power multiple frontend products.
-4. Backend source code is never sold.
+## Plan Governance Model
+Goal: maintain one master planning brain while allowing per-project and per-product limits.
 
-Current API projects:
-1. `shopcore-commerce-api` (PulseCart Commerce Cloud API)
-2. `helpdesk-support-api` (HelpdeskFlow Support API)
+Final structure:
+1. `official/plans/core/`
+   - global defaults: pricing guardrails, quota policy, trial policy, promotion rules.
+2. `official/plans/projects/<project>.json`
+   - project-level overrides: Shopcore vs Helpdesk plan differences.
+3. `official/plans/products/<product-slug>.json`
+   - optional product-level overrides for special bundles.
+4. Final applied plan (priority order):
+   - `core defaults -> project override -> product override`.
+5. Child APIs consume versioned plan snapshots from official:
+   - include `plan_version`, `effective_from`, and `rollback_to`.
 
-Current frontend products:
-1. Shopcore templates:
-   - `velora-boutique-storefront-pack`
-   - `playnest-toy-storefront-pack`
-   - `havenhaus-furniture-storefront-pack`
-   - `lunamuse-women-storefront-pack`
-2. Helpdesk templates:
-   - `assistly-support-portal-pack` (ticket)
-   - `caregrid-message-desk-pack` (message)
-   - `livepulse-chat-support-pack` (live chat)
-   - `aidesk-copilot-support-pack` (AI-assisted)
+This keeps maintenance low and avoids hardcoding limits separately in each child repo.
 
----
+Implementation reference:
+1. `plans/projects/official-to-child-plan-propagation.md`
 
-## 2) 6-Month Revenue Target
+## Revenue Target Breakdown
+Total goal in 6 months: `10,00,000`.
 
-Target gross revenue: `10,00,000` in 6 months.
-
-Monthly target breakdown:
+Monthly target:
 1. Month 1: `80,000`
 2. Month 2: `110,000`
 3. Month 3: `145,000`
@@ -42,145 +52,75 @@ Monthly target breakdown:
 5. Month 5: `220,000`
 6. Month 6: `255,000`
 
-Total: `10,00,000`
-
 Revenue mix target:
 1. API subscriptions: 60%
-2. Frontend template sales: 30%
-3. Setup/customization services: 10%
+2. Frontend product sales: 30%
+3. Setup/customization/onboarding: 10%
 
----
+## Launch Week Operating Playbook
+P0 (must ship this week):
+1. Live pages for:
+   - `shopcore-commerce-api`
+   - `helpdesk-support-api`
+   - 30 frontend products (20 commerce + 10 support)
+2. Every frontend product page must show required API dependency.
+3. Payment, license, and product access flow must pass full test.
+4. Demo URLs and CTA copy must be visible on all hero/product pages.
+5. Support intake and SLA expectation must be published.
 
-## 3) Cost Breakdown (Monthly and 6-Month)
+P1 (next 7-14 days):
+1. Bundle pages:
+   - Commerce API + 1 frontend product
+   - Support API + 1 frontend product
+2. Add onboarding upsell options.
+3. Add objection-handling FAQ from first buyer conversations.
 
-Estimated monthly operating cost:
-1. Hosting + infra: `20,000`
-2. Domains, email, tools, SaaS: `8,000`
-3. Marketing/ad spend: `35,000`
-4. Ops/support/freelance help: `20,000`
-5. Misc/risk buffer: `12,000`
+## Offer and Promotion Framework
+Use three copy angles in every campaign:
+1. Speed angle:
+   - "Go live in days, not months."
+2. Control angle:
+   - "One API. Multiple products. Lower maintenance."
+3. Revenue angle:
+   - "Launch niche products fast and scale catalog without backend rebuild."
 
-Estimated monthly total cost: `95,000`
+Product page CTA rules:
+1. Primary CTA: `Start API Subscription`
+2. Secondary CTA: `View Compatible Products`
+3. Dependency note: `This frontend requires <api-slug>`
+4. Trust note: `Managed infrastructure, no backend ownership needed`
 
-6-month cost estimate:
-1. `95,000 x 6 = 5,70,000`
+## Project Pipeline and Product Expansion
+Current live API projects:
+1. `shopcore-commerce-api` (PulseCart Commerce Cloud API)
+2. `helpdesk-support-api` (HelpdeskFlow Support API)
 
-6-month gross target: `10,00,000`  
-6-month projected contribution after direct ops cost: `4,30,000`
+Current live frontend products:
+1. 20 commerce products (Shopcore family)
+2. 10 support products (Helpdesk family)
 
----
-
-## 4) Unit Economics Targets
-
-1. Shopcore API average MRR per client: `12,000`
-2. Helpdesk API average MRR per client: `10,000`
-3. Frontend template average order value: `12,500`
-4. Setup add-on average order value: `8,000`
-
-Month-6 target run-rate example:
-1. Shopcore API clients: 8 -> `96,000` MRR
-2. Helpdesk API clients: 6 -> `60,000` MRR
-3. Frontend sales per month: 7 units x `12,500` -> `87,500`
-4. Setup add-ons per month: 2 x `8,000` -> `16,000`
-
-Month-6 total run-rate: `2,59,500` (close to `255,000` target)
-
----
-
-## 5) Go-To-Market Plan
-
-Week-1 go-live:
-1. Publish Shopcore API product page and all 4 storefront template products.
-2. Publish Helpdesk API product page and all 4 support template products.
-3. Show "requires API subscription" cross-links on every frontend product page.
-4. Demo URLs live for Shopcore and Helpdesk.
-5. Payment -> license -> access flow tested end-to-end.
-
-Week-2:
-1. Launch outreach campaign to agencies and small operators.
-2. Launch 2 offer bundles:
-   - Shopcore API + 1 template
-   - Helpdesk API + 1 template
-3. Add limited-time onboarding offer.
-
-Week-3 to Week-4:
-1. Collect buyer objections and update copy/FAQ/pricing.
-2. Push referral/affiliate launch for partner sellers.
-3. Close first 5 recurring API customers.
-
----
-
-## 6) Product Expansion Strategy
-
-Rule: Every new API project must launch with at least 2 frontend products.
+Catalog detail:
+1. `plans/projects/production-product-catalog.md`
 
 Next API projects to build:
-1. `LicenseOps Activation API`
-2. `NotifyStack Notification API` (email/SMS/WhatsApp orchestration)
-3. `SignalLens Analytics API` (usage, conversion, ops dashboards)
-4. `FlowBridge Automation API` (workflow triggers and integrations)
+1. `LicenseOps Activation Cloud`
+2. `NotifyStack Messaging Cloud`
+3. `FlowBridge Automation Cloud`
 
-Frontend packs per new API:
-1. LicenseOps:
-   - License seller portal
-   - Customer activation center
-2. NotifyStack:
-   - Campaign console
-   - Transactional alert center
-3. SignalLens:
-   - Executive KPI dashboard
-   - Growth analytics workspace
-4. FlowBridge:
-   - Workflow builder UI
-   - Integration command center
+Rule:
+1. New API cannot be launched unless it has at least 2 sellable frontend products.
 
----
+## Weekly KPI Scoreboard
+Track every week:
+1. New API subscribers by family (Shopcore/Helpdesk)
+2. Frontend units sold by product slug
+3. Bundle attach rate
+4. Demo-to-paid conversion
+5. Churn and renewal count
+6. Support load vs resolution time
+7. Ad spend vs closed revenue
 
-## 7) Naming Upgrade Suggestions
-
-Current names are usable. Better alternatives for stronger promotion:
-
-Shopcore API:
-1. `PulseCart Commerce Cloud API` (keep)
-2. `CartForge Commerce API`
-3. `NexaCart API Cloud`
-
-Helpdesk API:
-1. `HelpdeskFlow Support API` (keep)
-2. `SupportOrbit API`
-3. `ResolveDesk API`
-
-Shopcore templates:
-1. `Velora Boutique` (keep)
-2. `PlayNest Toy` (keep)
-3. `HavenHaus Furniture` (keep)
-4. `LunaMuse Women` (keep)
-
-Helpdesk templates:
-1. `Assistly Ticket Desk` (rename option from Support Portal)
-2. `CareGrid Message Desk` (keep)
-3. `LivePulse Chat Desk` (rename option from Chat Support)
-4. `AIDesk Copilot` (keep)
-
----
-
-## 8) Non-Negotiable Execution Rules
-
-1. No fake metrics in product or case study data.
-2. Case studies must reference real product slugs and real configuration states.
-3. Any frontend template must declare required API slug in metadata.
-4. No product listing outside actual build-and-sell scope.
-5. Ship fast, but keep catalog coherent and auditable.
-
----
-
-## 9) Tracking Dashboard (Weekly)
-
-Track these every week:
-1. New API subscribers (Shopcore, Helpdesk)
-2. Frontend template units sold
-3. API churn and renewals
-4. Demo -> paid conversion rate
-5. Support ticket volume and resolution speed
-6. Marketing spend vs closed revenue
-
+Non-negotiable:
+1. No fake metrics.
+2. No fake case studies.
+3. No product entries outside real sellable scope.
