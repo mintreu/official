@@ -17,6 +17,7 @@ class ProductController extends Controller
         $type = $request->string('type')->toString();
         $sort = $request->string('sort')->toString() ?: 'latest';
         $perPage = (int) ($request->input('per_page', 12));
+        $featured = filter_var($request->input('featured'), FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
 
         $query = Product::query();
 
@@ -51,6 +52,10 @@ class ProductController extends Controller
             } else {
                 $query->where('type', $type);
             }
+        }
+
+        if ($featured === true) {
+            $query->where('featured', true);
         }
 
         if ($sort === 'latest') {
@@ -91,6 +96,35 @@ class ProductController extends Controller
         return response()->json([
             'data' => (new ProductResource($product))->toArray(request()),
             'related' => ProductResource::collection($relatedProducts)->toArray(request()),
+            'matched_frontends' => $this->mapMatchedFrontends($product),
         ]);
+    }
+
+    private function mapMatchedFrontends(Product $apiProduct): array
+    {
+        if (! in_array($apiProduct->type?->value, ['api_service', 'api_referral'], true)) {
+            return [];
+        }
+
+        return Product::query()
+            ->where('type', 'downloadable')
+            ->whereJsonContains('meta->api_matches', $apiProduct->slug)
+            ->orderByDesc('featured')
+            ->orderByDesc('updated_at')
+            ->limit(8)
+            ->get()
+            ->map(fn (Product $product) => [
+                'id' => $product->id,
+                'slug' => $product->slug,
+                'title' => $product->title,
+                'short_description' => $product->short_description,
+                'image' => $product->image,
+                'demo_url' => $product->demo_url,
+                'documentation_url' => $product->documentation_url,
+                'price' => (float) $product->price_major,
+                'price_paise' => (int) $product->price,
+                'version' => $product->version,
+            ])
+            ->all();
     }
 }

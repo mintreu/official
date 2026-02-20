@@ -6,8 +6,11 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
 class LicensesTable
@@ -17,21 +20,21 @@ class LicensesTable
         return $table
             ->columns([
                 TextColumn::make('product.title')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('product_resource_id')
-                    ->numeric()
+                    ->label('Product')
                     ->sortable(),
                 TextColumn::make('user.name')
-                    ->numeric()
+                    ->label('User')
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('license_key')
                     ->searchable(),
-                TextColumn::make('license_type')
+                BadgeColumn::make('type')
+                    ->label('Type')
                     ->searchable(),
-                TextColumn::make('email')
-                    ->label('Email address')
-                    ->searchable(),
+                TextColumn::make('plan.name')
+                    ->label('Plan')
+                    ->placeholder('-')
+                    ->sortable(),
                 TextColumn::make('usage_count')
                     ->numeric()
                     ->sortable(),
@@ -59,7 +62,19 @@ class LicensesTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('type')
+                    ->options([
+                        'api_subscription' => 'API Subscription',
+                        'commercial_single_use' => 'Commercial Single',
+                        'commercial_3_uses' => 'Commercial 3 Uses',
+                        'commercial_10_uses' => 'Commercial 10 Uses',
+                        'free_single_use' => 'Free Single Use',
+                        'free_unlimited' => 'Free Unlimited',
+                        'free_attribution' => 'Free Attribution',
+                        'demo' => 'Demo',
+                    ]),
+                TernaryFilter::make('is_active')
+                    ->label('Active'),
             ])
             ->recordActions([
                 ViewAction::make(),

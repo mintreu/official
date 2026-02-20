@@ -16,6 +16,7 @@ class ProjectController extends Controller
         $category = $request->string('category')->toString();
         $sort = $request->string('sort')->toString() ?: 'latest';
         $perPage = (int) ($request->input('per_page', 9));
+        $featured = filter_var($request->input('featured'), FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
 
         $query = Project::query();
 
@@ -31,6 +32,10 @@ class ProjectController extends Controller
 
         if ($category !== '' && $category !== 'All') {
             $query->where('category', 'like', '%'.$category.'%');
+        }
+
+        if ($featured === true) {
+            $query->where('featured', true);
         }
 
         if ($sort === 'latest') {

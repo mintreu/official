@@ -9,6 +9,7 @@ use App\Models\Api\ApiEndpoint;
 use App\Models\Licensing\License;
 use App\Models\Products\DownloadLog;
 use App\Models\Products\Plan;
+use App\Models\Products\ProductReview;
 use App\Models\Products\ProductSource;
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -31,7 +32,7 @@ use Illuminate\Support\Str;
  * @property string|null $description Full description
  * @property string|null $content Rich content (markdown/HTML)
  * @property string|null $image Cover image URL
- * @property string $price Decimal price (0 = free)
+ * @property int $price Price in paise/cents minor units (0 = free)
  * @property string|null $category Product category
  * @property ProductType $type Product type (determines frontend behavior)
  * @property string|null $demo_url Demo/preview URL
@@ -80,7 +81,7 @@ class Product extends Model
             'type' => ProductType::class,
             'default_license' => LicenseType::class,
             'status' => PublishableStatusCast::class,
-            'price' => 'decimal:2',
+            'price' => 'integer',
             'downloads' => 'integer',
             'rating' => 'float',
             'featured' => 'boolean',
@@ -156,6 +157,11 @@ class Product extends Model
         return $this->hasMany(DownloadLog::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(ProductReview::class);
+    }
+
     /**
      * Categories (via categoryable pivot)
      */
@@ -191,6 +197,24 @@ class Product extends Model
     public function isFree(): bool
     {
         return $this->price <= 0 || $this->type === ProductType::Freebie;
+    }
+
+    public function getPriceMajorAttribute(): float
+    {
+        return $this->price / 100;
+    }
+
+    public function setPriceAttribute($value): void
+    {
+        if ($value === null || $value === '') {
+            $this->attributes['price'] = 0;
+
+            return;
+        }
+
+        // Accept major-unit price at write-time and store as integer minor units.
+        $numeric = (float) $value;
+        $this->attributes['price'] = (int) round($numeric * 100);
     }
 
     /**

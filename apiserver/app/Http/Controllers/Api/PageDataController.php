@@ -3,8 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CaseStudyResource;
+use App\Http\Resources\ProductResource;
+use App\Http\Resources\ProjectResource;
+use App\Models\Content\CaseStudy;
+use App\Models\Content\Project;
+use App\Models\Product;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\File;
 
 class PageDataController extends Controller
 {
@@ -15,19 +20,92 @@ class PageDataController extends Controller
      */
     public function home(): JsonResponse
     {
-        $basePath = base_path('../docs/backend/jsons/');
+        $featuredProjects = Project::query()
+            ->where('status', 'Published')
+            ->where('featured', true)
+            ->latest()
+            ->limit(6)
+            ->get();
+
+        $featuredCaseStudies = CaseStudy::query()
+            ->where('status', 'Published')
+            ->where('featured', true)
+            ->latest()
+            ->limit(3)
+            ->get();
+
+        $featuredProducts = Product::query()
+            ->where('status', 'Published')
+            ->where('featured', true)
+            ->latest()
+            ->limit(6)
+            ->with(['categories', 'engagement'])
+            ->get();
+
+        $technologies = collect()
+            ->merge(
+                Project::query()
+                    ->where('status', 'Published')
+                    ->pluck('technologies')
+                    ->flatten(1)
+            )
+            ->merge(
+                CaseStudy::query()
+                    ->where('status', 'Published')
+                    ->pluck('technologies')
+                    ->flatten(1)
+            )
+            ->filter()
+            ->unique()
+            ->values();
 
         $data = [
-            'services' => json_decode(File::get($basePath . 'services.json'), true),
-            'projects' => json_decode(File::get($basePath . 'projects.json'), true),
-            'caseStudies' => json_decode(File::get($basePath . 'case_studies.json'), true),
-            'marketplace' => json_decode(File::get($basePath . 'marketplace_products.json'), true),
-            // Add other static data if needed by the frontend
+            'featured_projects' => ProjectResource::collection($featuredProjects)->resolve(),
+            'case_studies' => CaseStudyResource::collection($featuredCaseStudies)->resolve(),
+            'products' => ProductResource::collection($featuredProducts)->resolve(),
             'stats' => [
-                ['value' => '100+', 'label' => 'Projects Delivered'],
-                ['value' => '50+', 'label' => 'Happy Clients'],
-                ['value' => '5+', 'label' => 'Years Experience'],
-                ['value' => '20+', 'label' => 'Technologies']
+                ['value' => Project::where('status', 'Published')->count(), 'suffix' => '+', 'label' => 'Projects Delivered'],
+                ['value' => Product::where('status', 'Published')->where('type', 'downloadable')->count(), 'suffix' => '+', 'label' => 'Ready Products'],
+                ['value' => Product::where('status', 'Published')->whereIn('type', ['api_service', 'api_referral'])->count(), 'suffix' => '', 'label' => 'API Projects'],
+                ['value' => $technologies->count(), 'suffix' => '+', 'label' => 'Technologies'],
+            ],
+            'services' => [
+                [
+                    'title' => 'Commerce API Platform',
+                    'icon' => 'lucide:shopping-bag',
+                    'description' => 'PulseCart Commerce Cloud API with catalog, orders, payments, vendor and licensing flows.',
+                    'features' => ['Catalog and order APIs', 'Payment gateway orchestration', 'Vendor provisioning', 'License validation'],
+                ],
+                [
+                    'title' => 'Support API Platform',
+                    'icon' => 'lucide:messages-square',
+                    'description' => 'HelpdeskFlow Support API powering ticket, messaging, live chat and AI-assisted flows.',
+                    'features' => ['Ticket pipeline APIs', 'Realtime message channels', 'Agent analytics', 'Knowledge integrations'],
+                ],
+                [
+                    'title' => 'Nuxt Commerce Products',
+                    'icon' => 'lucide:store',
+                    'description' => 'Category-personalized Nuxt full products for ecommerce verticals on shared API backbone.',
+                    'features' => ['Store + customer dashboard', 'Vendor/admin control panel', 'Brand-personalized UI', 'Fast launch stack'],
+                ],
+                [
+                    'title' => 'Nuxt Support Products',
+                    'icon' => 'lucide:headset',
+                    'description' => 'Support frontend products for ticket desk, message desk, live chat and AI copilot workflows.',
+                    'features' => ['Customer support portal', 'Agent workflow panels', 'Realtime conversations', 'Category-specific UX'],
+                ],
+                [
+                    'title' => 'SaaS License Orchestration',
+                    'icon' => 'lucide:key-round',
+                    'description' => 'Centralized license, site binding, subscription, renewal and API key lifecycle orchestration.',
+                    'features' => ['Plan-aware limits', 'Site-wise licenses', 'Auto renewal flows', 'Credential management'],
+                ],
+                [
+                    'title' => 'Deploy and Operations',
+                    'icon' => 'lucide:server-cog',
+                    'description' => 'Production deployments across local, staging, demo and production environments with observability.',
+                    'features' => ['Domain/subdomain mapping', 'Release channels', 'Operational monitoring', 'Backup and rollback'],
+                ],
             ],
             'comparisonData' => [
                 ['feature' => 'Availability', 'mintreu' => '24/7', 'agency' => 'Business Hours', 'platform' => 'Variable'],
@@ -55,17 +133,24 @@ class PageDataController extends Controller
                 'Priority 24/7 support',
                 'Cross-platform expertise (Web+Mobile+Desktop)'
             ],
-            'technologies' => [
-                'Laravel', 'Livewire', 'FilamentPHP', 'Nuxt', 'Next.js', 'Vue', 'React',
-                'TypeScript', 'Node.js', 'Python', 'Kotlin', 'Android', 'C#', 'C++',
-                'MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'TensorFlow', 'Docker'
-            ],
+            'technologies' => $technologies->all(),
             'socials' => [
                 ['name' => 'GitHub', 'url' => 'https://github.com', 'icon' => 'lucide:github'],
                 ['name' => 'Twitter', 'url' => 'https://twitter.com', 'icon' => 'lucide:twitter'],
                 ['name' => 'LinkedIn', 'url' => 'https://linkedin.com', 'icon' => 'lucide:linkedin'],
                 ['name' => 'Dev.to', 'url' => 'https://dev.to', 'icon' => 'lucide:pen-tool']
-            ]
+            ],
+            'paymentMethods' => [
+                ['name' => 'Stripe', 'icon' => 'lucide:credit-card', 'color' => 'text-blueprint-600'],
+                ['name' => 'Cashfree', 'icon' => 'lucide:banknote', 'color' => 'text-green-600'],
+                ['name' => 'Razorpay', 'icon' => 'lucide:indian-rupee', 'color' => 'text-mintreu-red-600'],
+                ['name' => 'Native', 'icon' => 'lucide:wallet', 'color' => 'text-titanium-500'],
+            ],
+            'quoteSteps' => [
+                ['title' => 'Send Requirements', 'description' => 'Share scope, product type and launch target.'],
+                ['title' => 'Receive Proposal', 'description' => 'Get plan, timeline, pricing and delivery milestones.'],
+                ['title' => 'Go Live', 'description' => 'Deploy product with support, billing and license handover.'],
+            ],
         ];
 
         return response()->json($data);

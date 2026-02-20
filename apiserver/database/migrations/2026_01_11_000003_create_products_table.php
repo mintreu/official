@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->text('description')->nullable();
             $table->longText('content')->nullable();
             $table->string('image')->nullable();
-            $table->decimal('price', 10, 2)->default(0);
+            $table->unsignedInteger('price')->default(0);
             $table->string('category')->nullable();
             $table->string('type')->nullable();
             $table->string('download_url')->nullable();

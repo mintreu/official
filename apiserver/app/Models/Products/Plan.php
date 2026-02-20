@@ -86,7 +86,7 @@ class Plan extends Model
     // ===== HELPERS =====
 
     /**
-     * Get price in dollars
+     * Get price in rupees.
      */
     public function getPriceAttribute(): float
     {
@@ -102,7 +102,7 @@ class Plan extends Model
             return 'Free';
         }
 
-        return '$'.number_format($this->price, 2);
+        return 'INR '.number_format($this->price, 2);
     }
 
     /**

@@ -59,4 +59,30 @@ return [
         'password' => env('BITBUCKET_APP_PASSWORD'),
     ],
 
+    'mintreu_saas' => [
+        'internal_key' => env('MINTREU_SAAS_INTERNAL_KEY'),
+        'internal_secret' => env('MINTREU_SAAS_INTERNAL_SECRET'),
+        'max_skew_seconds' => (int) env('MINTREU_SAAS_MAX_SKEW_SECONDS', 300),
+        'license_key' => env('MINTREU_SAAS_LICENSE_KEY'),
+        'license_secret' => env('MINTREU_SAAS_LICENSE_SECRET'),
+        'projects' => [
+            'shopcore-commerce-api' => [
+                'local_base_url' => env('MINTREU_CHILD_SHOPCORE_LOCAL_BASE_URL', 'http://shopcore.test'),
+                'production_base_url' => env('MINTREU_CHILD_SHOPCORE_PROD_BASE_URL', 'https://shopcore-api.mintreu.com'),
+                'provision_path' => env('MINTREU_CHILD_SHOPCORE_PROVISION_PATH', '/api/internal/saas/vendors/provision'),
+                'internal_key' => env('MINTREU_CHILD_SHOPCORE_INTERNAL_KEY'),
+                'internal_secret' => env('MINTREU_CHILD_SHOPCORE_INTERNAL_SECRET'),
+                'timeout_seconds' => (int) env('MINTREU_CHILD_SHOPCORE_TIMEOUT', 15),
+            ],
+            'helpdesk-support-api' => [
+                'local_base_url' => env('MINTREU_CHILD_HELPDESK_LOCAL_BASE_URL', 'http://helpdesk.test'),
+                'production_base_url' => env('MINTREU_CHILD_HELPDESK_PROD_BASE_URL', 'https://helpdesk-api.mintreu.com'),
+                'provision_path' => env('MINTREU_CHILD_HELPDESK_PROVISION_PATH', '/api/internal/saas/vendors/provision'),
+                'internal_key' => env('MINTREU_CHILD_HELPDESK_INTERNAL_KEY'),
+                'internal_secret' => env('MINTREU_CHILD_HELPDESK_INTERNAL_SECRET'),
+                'timeout_seconds' => (int) env('MINTREU_CHILD_HELPDESK_TIMEOUT', 15),
+            ],
+        ],
+    ],
+
 ];

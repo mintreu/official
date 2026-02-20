@@ -13,6 +13,7 @@ class CaseStudyController extends Controller
     public function index(Request $request): JsonResponse
     {
         $category = $request->string('category')->toString();
+        $featured = filter_var($request->input('featured'), FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
         $perPage = (int)($request->input('per_page', 6));
         $query = CaseStudy::query();
 
@@ -25,6 +26,10 @@ class CaseStudyController extends Controller
                     ->orWhere('challenge', 'like', '%' . $category . '%')
                     ->orWhere('solution', 'like', '%' . $category . '%');
             });
+        }
+
+        if ($featured === true) {
+            $query->where('featured', true);
         }
 
         $query->latest();
@@ -55,4 +60,3 @@ class CaseStudyController extends Controller
         ]);
     }
 }
-

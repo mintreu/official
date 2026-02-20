@@ -68,8 +68,8 @@ class ProductForm
                                             ->required()
                                             ->numeric()
                                             ->default(0.0)
-                                            ->prefix('$')
-                                            ->helperText('Set 0 for free products'),
+                                            ->prefix('INR')
+                                            ->helperText('Enter major-unit price, stored as paise internally. Set 0 for free products.'),
 
                                         Select::make('default_license')
                                             ->options(LicenseType::class)

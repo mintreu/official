@@ -7,7 +7,9 @@ use App\Models\Api\ApiKey;
 use App\Models\Product;
 use App\Models\Products\DownloadLog;
 use App\Models\Products\Plan;
+use App\Models\Saas\LicensedSite;
 use App\Models\User;
+use App\Traits\HasTransaction;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +21,7 @@ use Illuminate\Support\Str;
  * License Model - Product license/subscription for users
  *
  * @property int $id
+ * @property string $uuid
  * @property int $product_id
  * @property int|null $plan_id Plan purchased (for API products)
  * @property int|null $user_id
@@ -37,6 +40,7 @@ use Illuminate\Support\Str;
 class License extends Model
 {
     use HasFactory;
+    use HasTransaction;
 
     protected static function newFactory(): \Database\Factories\LicenseFactory
     {
@@ -44,6 +48,7 @@ class License extends Model
     }
 
     protected $fillable = [
+        'uuid',
         'product_id',
         'plan_id',
         'user_id',
@@ -103,6 +108,11 @@ class License extends Model
     public function apiKey(): HasOne
     {
         return $this->hasOne(ApiKey::class);
+    }
+
+    public function sites(): HasMany
+    {
+        return $this->hasMany(LicensedSite::class);
     }
 
     // ===== VALIDATION =====
@@ -231,6 +241,10 @@ class License extends Model
     protected static function booted(): void
     {
         static::creating(function (License $license) {
+            if (empty($license->uuid)) {
+                $license->uuid = (string) Str::uuid();
+            }
+
             if (empty($license->license_key)) {
                 $license->license_key = self::generateKey();
             }
@@ -247,6 +261,11 @@ class License extends Model
         });
     }
 
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
+
     /**
      * Generate unique license key
      */
@@ -259,5 +278,10 @@ class License extends Model
         }
 
         return implode('-', $segments);
+    }
+
+    protected function resolveTransactionAmount(): int
+    {
+        return (int) ($this->plan?->price_cents ?? 0);
     }
 }

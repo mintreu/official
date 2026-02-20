@@ -3,12 +3,12 @@
 namespace Database\Seeders;
 
 use App\Enums\LicenseType;
-use App\Enums\ProductType;
 use App\Models\Api\ApiKey;
-use App\Models\Licensing\License;
-use App\Models\Products\Plan;
+use App\Models\Api\ApiSpace;
 use App\Models\Product;
+use App\Models\Products\Plan;
 use App\Models\User;
+use App\Services\Licensing\LicenseManagementService;
 use Illuminate\Database\Seeder;
 
 class DashboardDemoSeeder extends Seeder
@@ -21,91 +21,130 @@ class DashboardDemoSeeder extends Seeder
             return;
         }
 
-        $downloadProduct = Product::where('slug', 'nextjs-saas-boilerplate')->first();
+        // Keep dashboard demo aligned with production catalog: no legacy/fake API products.
+        $this->seedApiSubscription(
+            user: $user,
+            productSlug: 'shopcore-commerce-api',
+            preferredPlanSlug: 'growth',
+            requestsThisMonth: 1200,
+            requestsToday: 95,
+            spaceName: 'Velori Demo Space',
+            website: 'https://demo-velori-boutique.mintreu.com',
+            topEndpoint: 'POST /api/orders'
+        );
 
-        if ($downloadProduct) {
-            License::updateOrCreate([
-                'product_id' => $downloadProduct->id,
-                'user_id' => $user->id,
-            ], [
-                'license_key' => License::generateKey(),
-                'type' => LicenseType::CommercialSingle,
-                'usage_count' => 2,
-                'max_usage' => 5,
-                'expires_at' => now()->addDays(180),
+        $this->seedApiSubscription(
+            user: $user,
+            productSlug: 'helpdesk-support-api',
+            preferredPlanSlug: 'starter',
+            requestsThisMonth: 18300,
+            requestsToday: 750,
+            spaceName: 'Tixora Demo Space',
+            website: 'https://demo-tixora-support.mintreu.com',
+            topEndpoint: 'POST /api/tickets'
+        );
+    }
+
+    private function seedApiSubscription(
+        User $user,
+        string $productSlug,
+        string $preferredPlanSlug,
+        int $requestsThisMonth,
+        int $requestsToday,
+        string $spaceName,
+        string $website,
+        string $topEndpoint
+    ): void {
+        $product = Product::query()->where('slug', $productSlug)->first();
+        if (! $product) {
+            return;
+        }
+
+        $plan = Plan::query()
+            ->where('product_id', $product->id)
+            ->where('slug', $preferredPlanSlug)
+            ->where('is_active', true)
+            ->first();
+
+        if (! $plan) {
+            $plan = Plan::query()
+                ->where('product_id', $product->id)
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->first();
+        }
+
+        if (! $plan) {
+            return;
+        }
+
+        $license = app(LicenseManagementService::class)->upsertSubscriptionLicense(
+            user: $user,
+            product: $product,
+            plan: $plan,
+            attributes: [
+                'usage_count' => 0,
+                'max_usage' => null,
+                'expires_at' => now()->addMonths(3),
                 'is_active' => true,
+            ]
+        );
+
+        $apiKey = $license->apiKey;
+
+        if (! $apiKey) {
+            $keyData = ApiKey::generateKey('sk_live');
+            $apiKey = ApiKey::query()->create([
+                'product_id' => $product->id,
+                'license_id' => $license->id,
+                'plan_id' => $plan->id,
+                'user_id' => $user->id,
+                'key_hash' => $keyData['hash'],
+                'key_prefix' => $keyData['prefix'],
+                'name' => $product->title.' API Key',
+                'environment' => 'prod',
+                'allowed_domains' => [parse_url($website, PHP_URL_HOST)],
+                'ip_whitelist' => [],
+                'is_active' => true,
+                'expires_at' => now()->addMonths(12),
+            ]);
+        } else {
+            $apiKey->update([
+                'plan_id' => $plan->id,
+                'is_active' => true,
+                'expires_at' => now()->addMonths(12),
+                'allowed_domains' => [parse_url($website, PHP_URL_HOST)],
             ]);
         }
 
-        $apiProduct = Product::firstOrCreate([
-            'slug' => 'mintreu-data-api',
-        ], [
-            'title' => 'Mintreu Data API',
-            'short_description' => 'Secure, rate-limited API that powers Mintreu product and licensing insights.',
-            'content' => '<p>Unlock Mintreu metadata, licensing status, and download orchestration through a single API.</p>',
-            'price' => 0,
-            'category' => 'API',
-            'type' => ProductType::ApiService,
-            'demo_url' => 'https://docs.mintreu.com/data-api',
-            'documentation_url' => 'https://docs.mintreu.com/data-api',
-            'version' => '1.0.0',
-            'downloads' => 0,
-            'rating' => 4.9,
-            'status' => 'Published',
-            'featured' => false,
-            'requires_auth' => true,
-            'default_license' => LicenseType::ApiSubscription,
-            'meta' => ['public' => true],
-            'api_config' => ['supports_webhooks' => true],
+        $apiKey->update([
+            'requests_this_month' => $requestsThisMonth,
+            'requests_today' => $requestsToday,
         ]);
 
-        $professionalPlan = Plan::updateOrCreate([
-            'product_id' => $apiProduct->id,
-            'slug' => 'professional',
-        ], [
-            'name' => 'Professional',
-            'description' => 'Monthly plan with high-throughput API access.',
-            'price_cents' => 9900,
-            'billing_cycle' => 'monthly',
-            'requests_per_month' => 120000,
-            'requests_per_day' => 5000,
-            'requests_per_minute' => 200,
-            'features' => ['Access to product metadata', 'Audit logs', 'Email + chat support'],
-            'limits' => ['domains' => 3],
-            'sort_order' => 1,
-            'is_popular' => true,
-            'is_active' => true,
-        ]);
-
-        $apiLicense = License::updateOrCreate([
-            'product_id' => $apiProduct->id,
-            'user_id' => $user->id,
-        ], [
-            'plan_id' => $professionalPlan->id,
-            'license_key' => License::generateKey(),
-            'type' => LicenseType::ApiSubscription,
-            'usage_count' => 1200,
-            'max_usage' => null,
-            'expires_at' => now()->addMonths(3),
-            'is_active' => true,
-        ]);
-
-        $keyData = ApiKey::generateKey('sk_live');
-
-        ApiKey::updateOrCreate([
-            'license_id' => $apiLicense->id,
-        ], [
-            'product_id' => $apiProduct->id,
-            'plan_id' => $professionalPlan->id,
-            'user_id' => $user->id,
-            'key_hash' => $keyData['hash'],
-            'key_prefix' => $keyData['prefix'],
-            'name' => 'Primary API Key',
-            'environment' => 'prod',
-            'requests_this_month' => 1200,
-            'requests_today' => 95,
-            'is_active' => true,
-            'expires_at' => now()->addMonths(12),
-        ]);
+        ApiSpace::query()->updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'api_key_id' => $apiKey->id,
+                'website' => $website,
+            ],
+            [
+                'product_id' => $product->id,
+                'name' => $spaceName,
+                'environment' => 'prod',
+                'status' => 'active',
+                'requests_this_month' => max(1, (int) floor($requestsThisMonth * 0.7)),
+                'requests_today' => max(1, (int) floor($requestsToday * 0.6)),
+                'last_request_at' => now()->subMinutes(8),
+                'config' => [
+                    'seeded' => true,
+                ],
+                'insights' => [
+                    'avg_latency_ms' => 110,
+                    'error_rate_percent' => 0.4,
+                    'top_endpoint' => $topEndpoint,
+                ],
+            ]
+        );
     }
 }

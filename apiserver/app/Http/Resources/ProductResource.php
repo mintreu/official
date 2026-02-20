@@ -21,7 +21,8 @@ class ProductResource extends JsonResource
             'short_description' => $this->short_description,
             'description' => $this->description,
             'image' => $this->image,
-            'price' => (float) $this->price,
+            'price' => (float) $this->price_major,
+            'price_paise' => (int) $this->price,
             'category' => $this->category,
             'type' => $this->type?->value,
             'type_label' => $this->type?->getLabel(),
@@ -55,6 +56,7 @@ class ProductResource extends JsonResource
             if ($this->type?->hasPlans()) {
                 $data['plans'] = $this->whenLoaded('plans', function () {
                     return $this->activePlans->map(fn ($plan) => [
+                        'id' => $plan->id,
                         'slug' => $plan->slug,
                         'name' => $plan->name,
                         'description' => $plan->description,
@@ -63,7 +65,10 @@ class ProductResource extends JsonResource
                         'billing_cycle' => $plan->billing_cycle,
                         'billing_label' => $plan->getBillingLabel(),
                         'requests_per_month' => $plan->requests_per_month,
+                        'requests_per_day' => $plan->requests_per_day,
+                        'requests_per_minute' => $plan->requests_per_minute,
                         'features' => $plan->features,
+                        'limits' => $plan->limits,
                         'is_popular' => $plan->is_popular,
                     ]);
                 });

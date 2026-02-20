@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\IntegrationType;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Integration extends Model
@@ -37,5 +38,9 @@ class Integration extends Model
             'last_tested_at' => 'datetime',
         ];
     }
-}
 
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class, 'integration_id');
+    }
+}

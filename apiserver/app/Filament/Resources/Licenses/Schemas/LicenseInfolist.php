@@ -13,13 +13,14 @@ class LicenseInfolist
         return $schema
             ->components([
                 TextEntry::make('product.title')
-                    ->numeric(),
-                TextEntry::make('product_resource_id')
-                    ->numeric(),
+                    ->label('Product'),
                 TextEntry::make('user.name')
-                    ->numeric(),
+                    ->label('User'),
+                TextEntry::make('plan.name')
+                    ->label('Plan')
+                    ->placeholder('-'),
                 TextEntry::make('license_key'),
-                TextEntry::make('license_type'),
+                TextEntry::make('type'),
                 TextEntry::make('email')
                     ->label('Email address'),
                 TextEntry::make('usage_count')
