@@ -24,3 +24,4 @@ Core rule:
 4. `./shopcore-category-locked-frontend-plan.md`
 5. `./production-product-catalog.md`
 6. `./official-to-child-plan-propagation.md`
+7. `./shopcore-official-saas-bridge.md`

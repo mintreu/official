@@ -1,0 +1,19 @@
+{
+  "project": "helpdesk",
+  "limits": {
+    "max_sites": 3,
+    "max_users": 40,
+    "max_products": 200,
+    "max_orders_per_day": 0
+  },
+  "rate_limits": {
+    "site": {
+      "per_minute": 180,
+      "decay_seconds": 60
+    },
+    "vendor": {
+      "per_minute": 240,
+      "decay_seconds": 60
+    }
+  }
+}

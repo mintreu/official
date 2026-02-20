@@ -1,43 +1,57 @@
-# TODO (Official)
+# TODO (Official) - Priority Ordered
 
-1. Setup .codex knowledge + docs indexing
-   - Add project summary + architecture notes
-   - Track confirmations before marking fixed
+## P0 - Launch Blockers (Must fix before production)
 
-2. Auth + user model
-   - Confirm auth flows (register/login, email/mobile)
-   - Ensure user table supports referral code + referral tracking
+1. Fix failing backend test suite to green
+- `Tests\Feature\Api\SaasProjectInsightsTest` fails due to duplicate `products.slug` (`shopcore-commerce-api`).
+- Update factory/test setup so slug collision cannot happen in refresh DB runs.
+- Re-run `composer test` and ensure full pass.
 
-3. Payment + purchase flow (reuse from commerinity)
-   - Port Transaction/PaymentService/HasTransaction + Cashfree integration
-   - Add purchase endpoints for plan subscriptions
-   - Webhook + verify -> license + api key issuance
+2. Complete ID hardening (no numeric ID exposure)
+- Audit all API resources/routes and dashboard links for `id` exposure.
+- Keep only `uuid` / `slug` in public payloads and route params.
+- Add regression tests for key endpoints (`licenses`, `api-spaces`, `saas/projects`).
 
-4. Referral (not MLM)
-   - Referral code generation
-   - Track referred sales + commission payouts
+3. Purchase flow baseline (production-safe)
+- Implement guest -> registration -> checkout -> subscription activation path end-to-end.
+- Ensure license + API key + site/space provisioning are generated via service classes only.
+- Validate renewal and re-license flow for existing customers.
 
-5. Sales + vouchers
-   - Cart not needed; apply voucher/discount in checkout
-   - Add voucher validation rules (old_project parity if needed)
+4. Seeder integrity for production-only data
+- Ensure no dummy/demo/fake copy remains in homepage/dashboard/case studies/products/projects.
+- Confirm seeder output is relationally consistent (projects <-> products <-> case studies <-> licenses).
+- Run clean seed on fresh DB and verify UI pages.
 
-6. Orders (digital)
-   - Order record + payment status + refund
-   - No shipping; digital delivery (download/access)
+## P1 - High Priority (Immediately after P0)
 
-7. License + subscription tracking
-   - Plan purchase -> license -> api key
-   - Renewal/cancel/expiry handling
+5. Dashboard IA + UX finalization
+- Make API Services -> Sites/Spaces -> License actions the primary flow.
+- Add missing clickable CTAs and route guards across landing + dashboard.
+- Finish premium widget states (loading/empty/error/success) for all major sections.
 
-8. Helpdesk + FAQ
-   - Admin FAQ + public FAQ
-   - Helpdesk tickets + responses
+6. Site/Space lifecycle and insights completion
+- Finalize create/edit/disable/restore lifecycle (soft delete + status sync).
+- Show per-site usage, health, and billing caps with clear actions.
+- Ensure child project heartbeat + usage ingestion maps correctly in official dashboard.
 
-9. Client UX
-   - Product purchase flow UI
-   - Download access gating + license modal
-   - Account dashboard (licenses, downloads, api keys, invoices)
+7. Docs/Knowledgebase integration
+- Add API guideline docs section (PDF/doc links + KB/blog entries) per API service product.
+- Link docs from product page + dashboard service detail page.
 
-10. Tests
-   - Payment, purchase, license, download
-   - Referral commission tests
+8. Reviews and ratings completion
+- Finish ordered-product/service review flow (write/update/list moderation strategy if needed).
+- Show trust signals in product detail and dashboard history.
+
+## P2 - Scale Readiness (Post-launch but planned now)
+
+9. Payment gateway finalization (4 gateways target)
+- Stripe, Cashfree, Razorpay, Native/manual flow (cash/backoffice).
+- Add webhook verification + transaction reconciliation + retry handling.
+
+10. Observability and runtime safety
+- Add structured logs, alerting hooks, and audit trail for license/site actions.
+- Build health checks for official <-> child API communication and license validation.
+
+11. Deployment checklist and rollback plan
+- Local (`*.mintreu.test`) and production (`*.mintreu.com`) env parity checklist.
+- Versioned migration/seed/deploy runbook and rollback steps.

@@ -1,0 +1,13 @@
+{
+  "product_slug": "velori-boutique",
+  "limits": {
+    "max_users": 20,
+    "max_products": 300
+  },
+  "rate_limits": {
+    "site": {
+      "per_minute": 200,
+      "decay_seconds": 60
+    }
+  }
+}
