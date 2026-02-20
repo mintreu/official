@@ -7,7 +7,7 @@
     <LandingFeatureProjects />
     <LandingCaseStudies />
     <LandingMarketplaceProjects />
-    <LandingContactSection />
+    <LandingQuoteWizard />
   </div>
 </template>
 

@@ -112,7 +112,8 @@ definePageMeta({
 })
 
 const config = useRuntimeConfig()
-const { login } = useSanctum()
+const { login, refreshUser } = useSanctum()
+const router = useRouter()
 const form = reactive({
   email: '',
   password: ''
@@ -151,6 +152,8 @@ const handleLogin = async () => {
       email: form.email,
       password: form.password
     })
+    await refreshUser()
+    await router.push('/dashboard')
   } catch (err: unknown) {
     error.value = resolveApiError(err, 'Unable to sign in with the provided credentials.')
   } finally {

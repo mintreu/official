@@ -79,19 +79,16 @@ gsap.registerPlugin(ScrollTrigger)
 
 const sectionRef = ref<HTMLElement | null>(null)
 let ctx: gsap.Context | null = null
+const { homeData, loadHomeData } = useHomeData()
 
-const socials = [
-  { name: 'GitHub', url: 'https://github.com', icon: 'lucide:github' },
-  { name: 'Twitter', url: 'https://twitter.com', icon: 'lucide:twitter' },
-  { name: 'LinkedIn', url: 'https://linkedin.com', icon: 'lucide:linkedin' },
-  { name: 'Dribbble', url: 'https://dribbble.com', icon: 'lucide:dribbble' },
-]
+const socials = computed(() => homeData.value?.socials ?? [])
 
 const scheduleCall = () => {
   window.open('https://calendly.com/mintreu', '_blank')
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await loadHomeData()
   if (!sectionRef.value) return
   ctx = gsap.context(() => {
     const tl = gsap.timeline({

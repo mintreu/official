@@ -95,19 +95,17 @@ gsap.registerPlugin(ScrollTrigger)
 
 const sectionRef = ref<HTMLElement | null>(null)
 let ctx: gsap.Context | null = null
+const { homeData, loadHomeData } = useHomeData()
 
-const comparisonData = [
-  { feature: 'Availability', mintreu: '24/7', agency: 'Business Hours', platform: 'Variable', mintScore: 100, agencyScore: 50, freelanceScore: 40 },
-  { feature: 'Response Time', mintreu: '< 2 hours', agency: '1-2 days', platform: 'Variable', mintScore: 95, agencyScore: 35, freelanceScore: 45 },
-  { feature: 'Communication', mintreu: 'Direct', agency: 'Via Manager', platform: 'Platform Only', mintScore: 100, agencyScore: 55, freelanceScore: 40 },
-  { feature: 'Platforms', mintreu: 'Web+Mobile+Desktop', agency: 'Usually Web Only', platform: 'Varies', mintScore: 100, agencyScore: 45, freelanceScore: 50 },
-  { feature: 'Flexibility', mintreu: 'Very High', agency: 'Limited', platform: 'Medium', mintScore: 95, agencyScore: 30, freelanceScore: 55 },
-  { feature: 'Cost', mintreu: 'Competitive', agency: 'High', platform: 'Variable', mintScore: 90, agencyScore: 40, freelanceScore: 60 },
-  { feature: 'Quality', mintreu: 'Excellent', agency: 'Good', platform: 'Varies', mintScore: 98, agencyScore: 70, freelanceScore: 45 },
-  { feature: 'Speed', mintreu: 'Fast', agency: 'Slow', platform: 'Varies', mintScore: 95, agencyScore: 35, freelanceScore: 50 },
-]
+const comparisonData = computed(() => (homeData.value?.comparisonData ?? []).map((row) => ({
+  ...row,
+  mintScore: 95,
+  agencyScore: 55,
+  freelanceScore: 45,
+})))
 
-onMounted(() => {
+onMounted(async () => {
+  await loadHomeData()
   if (!sectionRef.value) return
   ctx = gsap.context(() => {
     gsap.from('.comparison-header', {

@@ -1,15 +1,13 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-950 py-8">
-    <!-- Breadcrumb -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-      <nav class="flex items-center space-x-2 text-sm">
-        <NuxtLink to="/" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
-          Home
-        </NuxtLink>
-        <Icon name="lucide:chevron-right" class="w-4 h-4 text-gray-400" />
-        <span class="text-gray-900 dark:text-white font-medium">Products</span>
-      </nav>
-    </div>
+  <div class="min-h-screen bg-titanium-50 dark:bg-titanium-950 relative">
+    <!-- 3D Hero -->
+    <SharedPageHero
+      badge="Premium Solutions"
+      title="Our <span class='text-transparent bg-clip-text bg-gradient-to-r from-mintreu-red-400 via-mintreu-red-500 to-mintreu-red-600'>Products</span>"
+      subtitle="Ready-made solutions, API subscriptions, and code resources to accelerate your development"
+      node-color="#DC2626"
+      :node-count="40"
+    />
 
     <ProductListPage title="Our Products" subtitle="Ready-made solutions, API subscriptions, and code resources to accelerate your development" />
   </div>

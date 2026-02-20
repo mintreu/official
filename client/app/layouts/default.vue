@@ -74,7 +74,44 @@
               <span>Contact Us</span>
               <Icon name="lucide:arrow-right" class="w-4 h-4" />
             </NuxtLink>
+            <div v-if="isLoggedIn" class="relative">
+              <button
+                @click="userMenuOpen = !userMenuOpen"
+                class="hidden sm:inline-flex items-center space-x-2 px-4 lg:px-6 py-2 lg:py-2.5 bg-white border border-titanium-200 rounded-lg text-sm font-heading font-semibold text-titanium-700 shadow-sm transition-all duration-200"
+              >
+                <span>{{ user?.value?.name?.split(' ')[0] ?? 'Account' }}</span>
+                <Icon name="lucide:chevron-down" class="w-4 h-4" />
+              </button>
+              <Transition
+                enter-active-class="transition duration-200 ease-out"
+                enter-from-class="opacity-0 scale-95"
+                enter-to-class="opacity-100 scale-100"
+                leave-active-class="transition duration-150 ease-in"
+                leave-from-class="opacity-100 scale-100"
+                leave-to-class="opacity-0 scale-95"
+              >
+                <div
+                  v-if="userMenuOpen"
+                  class="absolute right-0 mt-2 min-w-[200px] rounded-2xl border border-titanium-200 dark:border-titanium-800 bg-white dark:bg-titanium-950 shadow-2xl z-50"
+                >
+                  <NuxtLink
+                    to="/dashboard"
+                    class="block px-4 py-3 text-sm font-semibold text-titanium-900 hover:bg-titanium-50 dark:text-white dark:hover:bg-titanium-900"
+                  >Dashboard</NuxtLink>
+                  <NuxtLink
+                    to="/contact"
+                    class="block px-4 py-3 text-sm font-semibold text-titanium-900 hover:bg-titanium-50 dark:text-white dark:hover:bg-titanium-900"
+                  >Profile & support</NuxtLink>
+                  <button
+                    type="button"
+                    class="w-full text-left px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50"
+                    @click="handleLogout()"
+                  >Sign Out</button>
+                </div>
+              </Transition>
+            </div>
             <NuxtLink
+              v-else
               to="/auth/signin"
               class="hidden sm:inline-flex items-center space-x-2 px-4 lg:px-6 py-2 lg:py-2.5 bg-white text-mintreu-red-600 hover:bg-mintreu-red-50 border border-mintreu-red-200 rounded-lg font-heading font-semibold shadow-sm transition-all duration-200"
             >
@@ -140,6 +177,25 @@
               <Icon name="lucide:arrow-right" class="w-4 h-4" />
             </NuxtLink>
             <NuxtLink
+              v-if="isLoggedIn"
+              to="/dashboard"
+              @click="mobileMenuOpen = false"
+              class="flex items-center justify-center space-x-2 w-full px-4 py-3 bg-white text-mintreu-red-600 rounded-lg border border-mintreu-red-200 font-heading font-semibold transition-colors duration-200"
+            >
+              <span>Dashboard</span>
+              <Icon name="lucide:layout-dashboard" class="w-4 h-4" />
+            </NuxtLink>
+            <button
+              v-if="isLoggedIn"
+              type="button"
+              @click="handleLogout()"
+              class="flex items-center justify-center space-x-2 w-full px-4 py-3 mt-3 bg-white text-rose-600 rounded-lg border border-rose-200 font-heading font-semibold transition-colors duration-200"
+            >
+              <Icon name="lucide:log-out" class="w-4 h-4" />
+              <span>Sign Out</span>
+            </button>
+            <NuxtLink
+              v-else
               to="/auth/signin"
               @click="mobileMenuOpen = false"
               class="flex items-center justify-center space-x-2 w-full mt-3 px-4 py-3 bg-white text-mintreu-red-600 rounded-lg border border-mintreu-red-200 font-heading font-semibold transition-colors duration-200"
@@ -274,6 +330,15 @@ const mobileMenuOpen = ref(false)
 const showScrollTop = ref(false)
 const currentYear = new Date().getFullYear()
 const route = useRoute()
+const router = useRouter()
+const { user, logout, isLoggedIn, refreshUser } = useSanctum()
+const userMenuOpen = ref(false)
+const handleLogout = async () => {
+  userMenuOpen.value = false
+  mobileMenuOpen.value = false
+  await logout()
+  router.push('/')
+}
 
 const currency = useState<'USD' | 'INR'>('currency', () => 'USD')
 
@@ -317,12 +382,14 @@ const scrollToTop = () => {
 }
 
 onMounted(() => {
+  // Keep navbar auth state in sync after hard refresh/navigation.
+  refreshUser()
   const handleScroll = () => { showScrollTop.value = window.scrollY > 400 }
   window.addEventListener('scroll', handleScroll)
   onUnmounted(() => { window.removeEventListener('scroll', handleScroll) })
 })
 
-watch(() => useRoute().fullPath, () => { mobileMenuOpen.value = false })
+watch(() => route.fullPath, () => { mobileMenuOpen.value = false; userMenuOpen.value = false })
 
 provide('currency', currency)
 </script>

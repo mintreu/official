@@ -156,48 +156,18 @@ gsap.registerPlugin(ScrollTrigger)
 
 const sectionRef = ref<HTMLElement | null>(null)
 let ctx: gsap.Context | null = null
+const { homeData, loadHomeData } = useHomeData()
 
-const soloFeatures = [
-  'Direct communication with expert developer',
-  'Personalized attention to project needs',
-  'Flexible working hours and timeline',
-  'Cost-effective development solutions',
-  'Full code ownership and documentation',
-  'Ongoing support and maintenance',
-]
+const soloFeatures = computed(() => homeData.value?.soloFeatures ?? [])
 
-const teamFeatures = [
-  'Team of specialized experts (Laravel, Nuxt, Kotlin)',
-  'Parallel development for faster delivery',
-  'Enterprise-grade code quality',
-  'Dedicated project manager',
-  'Priority 24/7 support',
-  'Cross-platform expertise (Web+Mobile+Desktop)',
-]
+const teamFeatures = computed(() => homeData.value?.teamFeatures ?? [])
 
-const quoteSteps = [
-  {
-    title: 'Send Your Requirements',
-    description: 'Share your project details, goals, and timeline. We\'ll review everything carefully.',
-  },
-  {
-    title: 'Receive Custom Quote',
-    description: 'Get a detailed proposal with scope, timeline, milestones, and transparent pricing.',
-  },
-  {
-    title: 'Start Building',
-    description: 'Once approved, we begin development with regular updates and deliverables.',
-  },
-]
+const quoteSteps = computed(() => homeData.value?.quoteSteps ?? [])
 
-const paymentMethods = [
-  { name: 'Stripe', icon: 'lucide:credit-card', color: 'text-blueprint-600' },
-  { name: 'PayPal', icon: 'lucide:wallet', color: 'text-blueprint-600' },
-  { name: 'Razorpay', icon: 'lucide:indian-rupee', color: 'text-mintreu-red-600' },
-  { name: 'Cashfree', icon: 'lucide:banknote', color: 'text-green-600' },
-]
+const paymentMethods = computed(() => homeData.value?.paymentMethods ?? [])
 
-onMounted(() => {
+onMounted(async () => {
+  await loadHomeData()
   if (!sectionRef.value) return
   ctx = gsap.context(() => {
     gsap.from('.pricing-header', {

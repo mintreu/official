@@ -79,47 +79,12 @@ gsap.registerPlugin(ScrollTrigger)
 
 const sectionRef = ref<HTMLElement | null>(null)
 let ctx: gsap.Context | null = null
+const { homeData, loadHomeData } = useHomeData()
 
-const services = [
-  {
-    title: 'Web Development',
-    icon: 'lucide:globe',
-    description: 'Full-stack web applications with Laravel, Nuxt.js, Next.js, and FilamentPHP. Responsive, scalable, and SEO-optimized.',
-    features: ['Laravel & FilamentPHP backends', 'Nuxt.js & Next.js frontends', 'Livewire reactive interfaces', 'RESTful & GraphQL APIs'],
-  },
-  {
-    title: 'Mobile Development',
-    icon: 'lucide:smartphone',
-    description: 'Native Android apps with Kotlin and cross-platform solutions. Play Store deployment and ongoing maintenance.',
-    features: ['Native Android with Kotlin', 'Cross-platform development', 'Material Design UI/UX', 'Play Store optimization'],
-  },
-  {
-    title: 'Desktop Applications',
-    icon: 'lucide:monitor',
-    description: 'Cross-platform desktop apps for Windows, macOS, and Linux. Electron and native solutions available.',
-    features: ['Electron applications', 'Native desktop solutions', 'Cross-platform compatibility', 'Auto-update systems'],
-  },
-  {
-    title: 'Database Solutions',
-    icon: 'lucide:database',
-    description: 'Expert database design and optimization. Support for MySQL, PostgreSQL, MongoDB, Redis, and more.',
-    features: ['MySQL & PostgreSQL', 'MongoDB & Redis', 'Database optimization', 'Migration services'],
-  },
-  {
-    title: 'AI & ML Integration',
-    icon: 'lucide:brain',
-    description: 'Artificial Intelligence and Machine Learning solutions with Python. Predictive analytics and automation.',
-    features: ['Python ML models', 'TensorFlow & PyTorch', 'Natural language processing', 'Computer vision'],
-  },
-  {
-    title: 'Payment Integration',
-    icon: 'lucide:credit-card',
-    description: 'Complete payment gateway integration for global and Indian markets with secure transactions.',
-    features: ['Stripe & PayPal (Global)', 'Razorpay & Cashfree (India)', 'Subscription billing', 'Secure PCI compliance'],
-  },
-]
+const services = computed(() => homeData.value?.services ?? [])
 
-onMounted(() => {
+onMounted(async () => {
+  await loadHomeData()
   if (!sectionRef.value) return
   ctx = gsap.context(() => {
     // Header

@@ -84,11 +84,12 @@
             <!-- Content -->
             <div v-if="product.content" class="mb-8 prose-content" v-html="product.content"></div>
 
-            <!-- Pricing Card -->
+            <!-- Pricing / Plan Card -->
             <div class="bg-white dark:bg-titanium-900 rounded-2xl p-8 mb-8 border-2 border-dashed border-mintreu-red-600/30 relative overflow-hidden">
               <div class="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-mintreu-red-600/40 rounded-tl-xl"></div>
               <div class="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-mintreu-red-600/40 rounded-br-xl"></div>
-              <div class="relative">
+
+              <div v-if="!isApiProduct" class="relative">
                 <div class="flex items-baseline space-x-2 mb-2">
                   <span class="text-5xl font-heading font-black text-mintreu-red-600">
                     {{ formatPrice(product.price) }}
@@ -101,6 +102,59 @@
                 <button class="w-full px-8 py-4 bg-mintreu-red-600 hover:bg-mintreu-red-700 text-white font-heading font-bold rounded-xl shadow-lg glow-red hover:shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-300">
                   {{ product.price === 0 ? 'Download Free' : 'Purchase Now' }}
                 </button>
+              </div>
+
+              <div v-else class="relative space-y-4">
+                <div class="flex items-center justify-between">
+                  <p class="text-xs uppercase tracking-wider font-heading font-bold text-titanium-500 dark:text-titanium-400">Subscription Plans</p>
+                  <span v-if="recommendedPlan" class="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                    Recommended: {{ recommendedPlan.name }}
+                  </span>
+                </div>
+
+                <article
+                  v-for="plan in subscriptionPlans"
+                  :key="plan.id"
+                  class="rounded-xl border border-dashed border-titanium-300 dark:border-titanium-700 p-4 space-y-3"
+                >
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <p class="font-heading font-bold text-titanium-900 dark:text-white">{{ plan.name }}</p>
+                      <p class="text-sm text-titanium-500 dark:text-titanium-400">{{ plan.description }}</p>
+                    </div>
+                    <span v-if="plan.is_popular" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-mintreu-red-100 text-mintreu-red-700 dark:bg-mintreu-red-900/40 dark:text-mintreu-red-300">
+                      Recommended
+                    </span>
+                  </div>
+
+                  <div class="flex items-end justify-between gap-4">
+                    <p class="text-2xl font-heading font-black text-mintreu-red-600">
+                      {{ plan.price_formatted }}<span class="text-sm font-semibold text-titanium-500 dark:text-titanium-400 ml-1">{{ plan.billing_label }}</span>
+                    </p>
+                    <button
+                      type="button"
+                      class="px-4 py-2.5 rounded-xl bg-mintreu-red-600 hover:bg-mintreu-red-700 text-white text-sm font-heading font-bold transition-colors disabled:opacity-60"
+                      :disabled="subscribingPlanId === plan.id"
+                      @click="subscribeToPlan(plan)"
+                    >
+                      {{ subscribingPlanId === plan.id ? 'Subscribing...' : 'Subscribe' }}
+                    </button>
+                  </div>
+
+                  <ul v-if="plan.features?.length" class="grid sm:grid-cols-2 gap-2">
+                    <li
+                      v-for="feature in plan.features"
+                      :key="feature"
+                      class="text-xs text-titanium-600 dark:text-titanium-300 flex items-center gap-2"
+                    >
+                      <Icon name="lucide:check-circle-2" class="w-3.5 h-3.5 text-emerald-500" />
+                      <span>{{ feature }}</span>
+                    </li>
+                  </ul>
+                </article>
+
+                <p v-if="subscribeSuccess" class="text-xs text-emerald-600 dark:text-emerald-400">{{ subscribeSuccess }}</p>
+                <p v-if="subscribeError" class="text-xs text-rose-600 dark:text-rose-400">{{ subscribeError }}</p>
               </div>
             </div>
 
@@ -124,6 +178,32 @@
             </div>
           </div>
         </div>
+
+        <section v-if="isApiProduct && matchedFrontends.length > 0" class="space-y-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-heading font-bold text-titanium-900 dark:text-white">Recommended Frontends</h2>
+            <span class="text-xs uppercase tracking-wider font-heading font-bold text-titanium-500 dark:text-titanium-400">For this API</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <NuxtLink
+              v-for="frontend in matchedFrontends"
+              :key="frontend.id"
+              :to="`/products/${frontend.slug}`"
+              class="related-card group block p-6 rounded-2xl bg-white dark:bg-titanium-900 border border-dashed border-titanium-300 dark:border-titanium-700 hover:border-mintreu-red-600/50 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+            >
+              <h3 class="text-lg font-heading font-bold text-titanium-900 dark:text-white mb-2 group-hover:text-mintreu-red-600 transition-colors">
+                {{ frontend.title }}
+              </h3>
+              <p class="text-sm text-titanium-600 dark:text-titanium-400 line-clamp-2 font-subheading mb-3">{{ frontend.short_description }}</p>
+              <div class="flex items-center justify-between">
+                <span class="font-heading font-black text-lg text-titanium-900 dark:text-white">
+                  {{ formatPrice(frontend.price) }}
+                </span>
+                <span class="text-xs text-mintreu-red-600 font-heading font-bold">View frontend</span>
+              </div>
+            </NuxtLink>
+          </div>
+        </section>
 
         <!-- Related Products -->
         <section v-if="relatedProducts.length > 0" class="space-y-6">
@@ -168,7 +248,8 @@
 
 <script setup lang="ts">
 import { computed, ref, watch, onUnmounted, nextTick } from 'vue'
-import type { Product } from '~/types/api'
+import type { MatchedFrontend, Product, ProductPlan } from '~/types/api'
+import { resolveApiError } from '~/utils/api-error'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -181,9 +262,15 @@ let ctx: gsap.Context | null = null
 const slug = computed(() => route.params.slug as string | undefined)
 const product = ref<Product | null>(null)
 const relatedProducts = ref<Product[]>([])
+const matchedFrontends = ref<MatchedFrontend[]>([])
 const pending = ref(false)
 const fetchError = ref<Error | null>(null)
 const currency = inject('currency', ref('USD'))
+const router = useRouter()
+
+const subscribingPlanId = ref<number | null>(null)
+const subscribeSuccess = ref<string | null>(null)
+const subscribeError = ref<string | null>(null)
 
 const { getProduct } = useApi()
 
@@ -204,6 +291,7 @@ const loadProduct = async () => {
     const response = await getProduct(slug.value) as any
     product.value = response?.data ?? null
     relatedProducts.value = response?.related ?? []
+    matchedFrontends.value = response?.matched_frontends ?? []
   } catch (error) {
     fetchError.value = error as Error
     console.error('Unable to load product', error)
@@ -253,9 +341,73 @@ const formatPrice = (price: number) => {
   return currency.value === 'USD' ? `$${price}` : `\u20B9${(price * 82).toFixed(0)}`
 }
 
+const isApiProduct = computed(() => {
+  const type = product.value?.type
+  return type === 'api_service' || type === 'api_referral'
+})
+
+const subscriptionPlans = computed<ProductPlan[]>(() => {
+  const plans = product.value?.plans ?? []
+  return Array.isArray(plans) ? plans : []
+})
+
+const recommendedPlan = computed(() => {
+  if (subscriptionPlans.value.length === 0) {
+    return null
+  }
+  return subscriptionPlans.value.find((plan) => plan.is_popular) ?? subscriptionPlans.value[0]
+})
+
+const subscribeToPlan = async (plan: ProductPlan) => {
+  if (!product.value) {
+    return
+  }
+
+  subscribeSuccess.value = null
+  subscribeError.value = null
+  subscribingPlanId.value = plan.id
+
+  try {
+    const payload = await useSanctumFetch<{ data: { id: number; uuid: string } }>(
+      '/api/licenses/subscribe',
+      {
+        method: 'POST',
+        body: {
+          product_slug: product.value.slug,
+          plan_id: plan.id
+        }
+      }
+    )
+
+    subscribeSuccess.value = 'Subscription activated. Redirecting to dashboard...'
+    const licenseUuid = payload?.data?.uuid
+    if (licenseUuid) {
+      await router.push(`/dashboard/licenses/${licenseUuid}`)
+      return
+    }
+    await router.push('/dashboard/licenses')
+  } catch (err: unknown) {
+    const status = (err as any)?.statusCode || (err as any)?.status
+    if (status === 401) {
+      await router.push('/auth/signin')
+      return
+    }
+    subscribeError.value = resolveApiError(err, 'Unable to start subscription for this plan.')
+  } finally {
+    subscribingPlanId.value = null
+  }
+}
+
 const getTypeLabel = (type: string) => {
   const labels: Record<string, string> = {
-    api: 'API', template: 'Template', plugin: 'Plugin', freebie: 'Free', media: 'Media'
+    api: 'API',
+    api_service: 'API Service',
+    api_referral: 'API Referral',
+    template: 'Template',
+    downloadable: 'Downloadable',
+    plugin: 'Plugin',
+    freebie: 'Free',
+    media: 'Media'
   }
   return labels[type] || type || 'Product'
 }

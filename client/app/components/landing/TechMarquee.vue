@@ -37,13 +37,13 @@
 </template>
 
 <script setup lang="ts">
-const technologiesRow1 = [
-  'Laravel', 'Livewire', 'FilamentPHP', 'Nuxt', 'Next.js', 'Vue', 'React',
-  'TypeScript', 'Node.js', 'Python', 'Kotlin',
-]
+const { homeData, loadHomeData } = useHomeData()
 
-const technologiesRow2 = [
-  'Android', 'C#', 'C++', 'MySQL', 'PostgreSQL', 'MongoDB', 'Redis',
-  'TensorFlow', 'Docker', 'Kubernetes', 'AWS',
-]
+onMounted(async () => {
+  await loadHomeData()
+})
+
+const technologies = computed(() => homeData.value?.technologies ?? [])
+const technologiesRow1 = computed(() => technologies.value.filter((_, index) => index % 2 === 0))
+const technologiesRow2 = computed(() => technologies.value.filter((_, index) => index % 2 !== 0))
 </script>

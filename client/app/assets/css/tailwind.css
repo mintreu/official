@@ -143,6 +143,28 @@
   .perspective-container {
     perspective: 1000px;
   }
+
+  /* Dashboard form input base */
+  .input-dashboard {
+    @apply w-full px-4 py-2.5 rounded-xl border text-sm transition-colors;
+    @apply border-titanium-200 dark:border-titanium-700;
+    @apply bg-white dark:bg-titanium-800;
+    @apply text-titanium-900 dark:text-white;
+    @apply placeholder:text-titanium-400 dark:placeholder:text-titanium-500;
+    @apply focus:outline-none focus:ring-2 focus:ring-mintreu-red-500/50 focus:border-mintreu-red-500;
+  }
+
+  /* Dashboard card base */
+  .card-dashboard {
+    @apply bg-white dark:bg-titanium-900/80;
+    @apply border border-titanium-200 dark:border-titanium-800;
+    @apply rounded-2xl shadow-sm;
+  }
+
+  /* Dashboard skeleton */
+  .skeleton-dashboard {
+    @apply bg-titanium-200 dark:bg-titanium-800 animate-pulse rounded-2xl;
+  }
 }
 
 @layer utilities {
@@ -181,4 +203,18 @@
 @keyframes pulse-ring-anim {
   0% { opacity: 1; transform: scale(1); }
   100% { opacity: 0; transform: scale(1.15); }
+}
+
+/* Dashboard page transitions */
+.page-slide-enter-active,
+.page-slide-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.page-slide-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.page-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }

@@ -7,6 +7,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "test:e2e": "playwright test",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
@@ -23,6 +24,7 @@
     "vue-router": "^4.6.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@types/three": "^0.182.0"
   }
 }

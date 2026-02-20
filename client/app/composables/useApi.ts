@@ -6,7 +6,9 @@ import type {
   Category,
   HomePageData,
   ApiResponse,
-  PaginatedResponse
+  PaginatedResponse,
+  QuoteRequest,
+  ReferralDashboard
 } from '~/types/api'
 
 /**
@@ -112,13 +114,32 @@ export default function useApi() {
   const submitContact = (data: {
     name: string
     email: string
-    project_type?: string
-    budget?: string
+    company?: string
+    mobile?: string
     message: string
   }) => {
     return useSanctumFetch('/api/contact', {
       method: 'POST',
       body: data
+    })
+  }
+
+  // ==================== QUOTE WIZARD ====================
+  const submitQuote = (data: QuoteRequest) => {
+    return useSanctumFetch('/api/quote', {
+      method: 'POST',
+      body: data
+    })
+  }
+
+  // ==================== REFERRALS ====================
+  const getReferralDashboard = (params?: {
+    page?: number
+    per_page?: number
+  }) => {
+    return useSanctumFetch<ApiResponse<ReferralDashboard>>('/api/referrals/dashboard', {
+      method: 'GET',
+      params
     })
   }
 
@@ -143,6 +164,8 @@ export default function useApi() {
     getArticles,
     getArticle,
     submitContact,
+    submitQuote,
+    getReferralDashboard,
     getCategories
   }
 }

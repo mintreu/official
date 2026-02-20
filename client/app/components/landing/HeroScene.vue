@@ -1,12 +1,13 @@
 <template>
   <section ref="heroRef" class="relative min-h-screen flex items-center justify-center overflow-hidden bg-titanium-100 dark:bg-titanium-950">
     <!-- 3D Background Layer -->
-    <div class="absolute inset-0 z-0">
+    <div class="absolute inset-0 z-0 pointer-events-none">
       <ClientOnly>
         <TresCanvas
           :clear-color="clearColor"
           :alpha="true"
           window-size
+          class="pointer-events-none"
         >
           <TresPerspectiveCamera :position="[0, 0, 8]" :fov="60" />
           <TresAmbientLight :intensity="0.4" />
@@ -23,10 +24,10 @@
     </div>
 
     <!-- Blueprint Grid CSS Overlay -->
-    <div class="absolute inset-0 bg-blueprint z-[1]"></div>
+    <div class="absolute inset-0 bg-blueprint z-[1] pointer-events-none"></div>
 
     <!-- Vignette Overlay -->
-    <div class="absolute inset-0 z-[2] vignette-overlay"></div>
+    <div class="absolute inset-0 z-[2] vignette-overlay pointer-events-none"></div>
 
     <!-- Content Layer -->
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
@@ -95,18 +96,18 @@
     </div>
 
     <!-- Scroll Indicator -->
-    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce-slow z-10">
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce-slow z-10 pointer-events-none">
       <div class="w-8 h-14 rounded-full border-2 border-titanium-400 dark:border-titanium-600 flex items-start justify-center p-2">
         <div class="w-1.5 h-3 bg-mintreu-red-600 rounded-full animate-pulse"></div>
       </div>
     </div>
 
     <!-- Technical dimension lines (decorative) -->
-    <div class="absolute top-20 left-8 hidden lg:block z-10">
+    <div class="absolute top-20 left-8 hidden lg:block z-10 pointer-events-none">
       <div class="w-px h-32 bg-gradient-to-b from-mintreu-red-600/0 via-mintreu-red-600/40 to-mintreu-red-600/0"></div>
       <div class="absolute top-1/2 left-2 label-schematic whitespace-nowrap transform -rotate-90 origin-left">SEC-001</div>
     </div>
-    <div class="absolute top-20 right-8 hidden lg:block z-10">
+    <div class="absolute top-20 right-8 hidden lg:block z-10 pointer-events-none">
       <div class="w-px h-32 bg-gradient-to-b from-blueprint-500/0 via-blueprint-500/40 to-blueprint-500/0"></div>
       <div class="absolute top-1/2 right-2 label-schematic whitespace-nowrap transform rotate-90 origin-right">REV-A</div>
     </div>
@@ -122,19 +123,16 @@ const statRefs = ref<(HTMLElement | null)[]>([])
 const colorMode = useColorMode()
 const isMobile = ref(false)
 let ctx: gsap.Context | null = null
+const { homeData, loadHomeData } = useHomeData()
 
 const clearColor = computed(() =>
   colorMode.value === 'dark' ? '#1a1d1e' : '#f1f3f5'
 )
 
-const stats = [
-  { value: 100, suffix: '+', label: 'Projects Delivered' },
-  { value: 50, suffix: '+', label: 'Happy Clients' },
-  { value: 5, suffix: '+', label: 'Years Experience' },
-  { value: 20, suffix: '+', label: 'Technologies' },
-]
+const stats = computed(() => homeData.value?.stats ?? [])
 
-onMounted(() => {
+onMounted(async () => {
+  await loadHomeData()
   isMobile.value = window.innerWidth < 768
   if (!heroRef.value) return
 

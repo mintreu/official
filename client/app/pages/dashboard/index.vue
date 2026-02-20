@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { resolveApiError } from '~/utils/api-error'
-import type { LicenseDashboardPayload } from '~/types/api'
+import type { LicenseDashboardPayload, LicenseOverviewSummaryPayload, LicenseProjectInsight } from '~/types/api'
 import gsap from 'gsap'
 
 definePageMeta({
@@ -24,7 +24,21 @@ const {
   })
 )
 
+const { data: overviewSummary } = await useAsyncData(
+  'dashboard-overview-summary',
+  () => useSanctumFetch<LicenseOverviewSummaryPayload>('/api/licenses/summary', {
+    method: 'GET'
+  })
+)
+
 const licenses = computed(() => payload.value?.data ?? [])
+const summaryTotals = computed(() => overviewSummary.value?.data?.totals ?? null)
+const siteBilling = computed(() => overviewSummary.value?.data?.site_billing ?? [])
+const projectInsights = computed<LicenseProjectInsight[]>(() => overviewSummary.value?.data?.project_insights ?? [])
+const upcomingRenewals = computed(() => overviewSummary.value?.data?.upcoming_renewals ?? [])
+const estimatedExtraCost = computed(() =>
+  siteBilling.value.reduce((sum, item) => sum + Number(item.estimated_extra_monthly_cost ?? 0), 0)
+)
 const paidDownloads = computed(() => licenses.value.filter((item) => item.product.type === 'downloadable').length)
 const apiSubscriptions = computed(() => licenses.value.filter((item) => ['api_service', 'api_referral'].includes(item.product.type)).length)
 const fetchError = computed(() => (error.value ? resolveApiError(error.value, 'Unable to load dashboard overview.') : null))
@@ -188,7 +202,7 @@ onUnmounted(() => { ctx?.revert() })
         <div class="stat-card-anim">
           <DashboardStatCard
             label="API subscriptions"
-            :value="apiSubscriptions"
+            :value="summaryTotals?.active_api_subscriptions ?? apiSubscriptions"
             icon="lucide:cloud-cog"
             color="emerald"
             subtitle="Active services"
@@ -198,16 +212,89 @@ onUnmounted(() => { ctx?.revert() })
         </div>
         <div class="stat-card-anim">
           <DashboardStatCard
-            label="Referral earnings"
-            :value="0"
-            icon="lucide:share-2"
+            label="API projects"
+            :value="summaryTotals?.active_api_projects ?? projectInsights.length"
+            icon="lucide:server-cog"
             color="amber"
-            subtitle="Total earned"
+            subtitle="Connected services"
             :sparkline-data="referralSparkline"
           />
         </div>
       </div>
     </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <DashboardDashboardCard title="Billing signal" subtitle="Site add-on estimate">
+        <div class="flex items-end justify-between gap-4">
+          <div>
+            <p class="text-xs uppercase tracking-wider text-titanium-500 dark:text-titanium-400">Estimated extra monthly</p>
+            <p class="text-3xl font-heading font-black text-titanium-900 dark:text-white">${{ estimatedExtraCost.toFixed(2) }}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-xs uppercase tracking-wider text-titanium-500 dark:text-titanium-400">Expiring soon</p>
+            <p class="text-2xl font-heading font-black text-amber-600 dark:text-amber-400">{{ summaryTotals?.expiring_soon ?? 0 }}</p>
+          </div>
+        </div>
+      </DashboardDashboardCard>
+      <DashboardDashboardCard title="Renewal queue" subtitle="Next subscriptions to renew" class="lg:col-span-2">
+        <div v-if="upcomingRenewals.length === 0" class="text-sm text-titanium-500 dark:text-titanium-400">
+          No upcoming renewals in the next 7 days.
+        </div>
+        <div v-else class="space-y-2">
+          <div
+            v-for="item in upcomingRenewals.slice(0, 4)"
+            :key="item.license_uuid"
+            class="rounded-lg border border-titanium-200 dark:border-titanium-700 px-3 py-2 flex items-center justify-between"
+          >
+            <div class="min-w-0">
+              <p class="font-semibold text-sm text-titanium-900 dark:text-white truncate">{{ item.product_slug }}</p>
+              <p class="text-xs text-titanium-500 dark:text-titanium-400">Plan: {{ item.plan ?? 'N/A' }}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-xs text-titanium-500 dark:text-titanium-400">Days left</p>
+              <p class="font-heading font-bold text-amber-600 dark:text-amber-400">{{ item.days_left ?? '-' }}</p>
+            </div>
+          </div>
+        </div>
+      </DashboardDashboardCard>
+    </div>
+
+    <DashboardDashboardCard title="API project health" subtitle="Per project requests and active spaces">
+      <div v-if="projectInsights.length === 0" class="text-sm text-titanium-500 dark:text-titanium-400">
+        No API project insights available yet.
+      </div>
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <article
+          v-for="project in projectInsights"
+          :key="project.product_slug ?? String(project.product_id)"
+          class="rounded-xl border border-titanium-200 dark:border-titanium-700 p-4"
+        >
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-titanium-900 dark:text-white truncate">{{ project.product_title ?? project.product_slug ?? 'API project' }}</p>
+              <p class="text-xs text-titanium-500 dark:text-titanium-400 truncate">{{ project.product_slug ?? 'n/a' }}</p>
+            </div>
+            <span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 px-2.5 py-1 text-xs font-semibold">
+              {{ project.active_licenses }} license
+            </span>
+          </div>
+          <div class="mt-3 grid grid-cols-3 gap-2 text-center">
+            <div class="rounded-lg bg-titanium-100 dark:bg-titanium-800 p-2">
+              <p class="text-[10px] uppercase text-titanium-500 dark:text-titanium-400">Spaces</p>
+              <p class="text-sm font-bold text-titanium-900 dark:text-white">{{ project.spaces }}</p>
+            </div>
+            <div class="rounded-lg bg-titanium-100 dark:bg-titanium-800 p-2">
+              <p class="text-[10px] uppercase text-titanium-500 dark:text-titanium-400">Month</p>
+              <p class="text-sm font-bold text-titanium-900 dark:text-white">{{ project.requests_this_month.toLocaleString() }}</p>
+            </div>
+            <div class="rounded-lg bg-titanium-100 dark:bg-titanium-800 p-2">
+              <p class="text-[10px] uppercase text-titanium-500 dark:text-titanium-400">Today</p>
+              <p class="text-sm font-bold text-titanium-900 dark:text-white">{{ project.requests_today.toLocaleString() }}</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </DashboardDashboardCard>
 
     <!-- Charts Row -->
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
@@ -308,7 +395,7 @@ onUnmounted(() => { ctx?.revert() })
         <div v-else class="space-y-3">
           <article
             v-for="license in licenses.slice(0, 3)"
-            :key="license.id"
+            :key="license.uuid"
             class="rounded-xl border border-titanium-200 dark:border-titanium-700 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 hover:border-titanium-300 dark:hover:border-titanium-600 transition-colors"
           >
             <div class="flex items-center gap-3 min-w-0">
@@ -327,7 +414,7 @@ onUnmounted(() => { ctx?.revert() })
               </div>
             </div>
             <NuxtLink
-              :to="`/dashboard/licenses/${license.id}`"
+              :to="`/dashboard/licenses/${license.uuid}`"
               class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-titanium-900 dark:bg-titanium-700 text-white text-xs font-semibold hover:bg-titanium-800 dark:hover:bg-titanium-600 transition-colors flex-shrink-0"
             >
               View

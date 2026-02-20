@@ -255,6 +255,45 @@ const loadCategories = async () => {
 const normalizePaginated = (response: any): PaginatedResponse<Product> | null => {
   if (response?.data && Array.isArray(response.data) && response?.meta) return response as PaginatedResponse<Product>
   if (response?.data?.data && Array.isArray(response.data.data) && response?.data?.meta) return response.data as PaginatedResponse<Product>
+  if (response?.data && Array.isArray(response.data) && response?.current_page) {
+    return {
+      data: response.data,
+      meta: {
+        current_page: response.current_page,
+        from: response.from,
+        last_page: response.last_page,
+        per_page: Number(response.per_page ?? 0),
+        to: response.to,
+        total: response.total,
+      },
+      links: {
+        first: response.first_page_url,
+        last: response.last_page_url,
+        prev: response.prev_page_url,
+        next: response.next_page_url,
+      },
+    } as PaginatedResponse<Product>
+  }
+  if (response?.data?.data && Array.isArray(response.data.data) && response?.data?.current_page) {
+    const page = response.data
+    return {
+      data: page.data,
+      meta: {
+        current_page: page.current_page,
+        from: page.from,
+        last_page: page.last_page,
+        per_page: Number(page.per_page ?? 0),
+        to: page.to,
+        total: page.total,
+      },
+      links: {
+        first: page.first_page_url,
+        last: page.last_page_url,
+        prev: page.prev_page_url,
+        next: page.next_page_url,
+      },
+    } as PaginatedResponse<Product>
+  }
   return null
 }
 

@@ -1,31 +1,16 @@
 <template>
-  <div class="min-h-screen bg-titanium-50 dark:bg-titanium-950 py-8 relative">
-    <div class="absolute inset-0 bg-blueprint-fine pointer-events-none"></div>
+  <div class="min-h-screen bg-titanium-50 dark:bg-titanium-950 relative">
+    <!-- 3D Hero -->
+    <SharedPageHero
+      badge="Latest Updates"
+      title="<span class='text-transparent bg-clip-text bg-gradient-to-r from-mintreu-red-400 via-mintreu-red-500 to-mintreu-red-600'>Insights</span> & Tutorials"
+      subtitle="Tutorials, guides, and resources to help you build better applications"
+      node-color="#3b82f6"
+    />
 
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Breadcrumb -->
-      <nav class="flex items-center space-x-2 text-sm mb-8">
-        <NuxtLink to="/" class="text-titanium-500 hover:text-mintreu-red-600 font-subheading transition-colors">Home</NuxtLink>
-        <Icon name="lucide:chevron-right" class="w-4 h-4 text-titanium-400" />
-        <span class="text-titanium-900 dark:text-white font-heading font-bold text-xs uppercase tracking-wider">Insights</span>
-      </nav>
+    <div class="absolute inset-0 bg-blueprint-fine pointer-events-none" style="top: 50vh;"></div>
 
-      <!-- Header -->
-      <div ref="sectionRef" class="insights-header text-center mb-16">
-        <div class="inline-block mb-4">
-          <span class="px-4 py-2 bg-mintreu-red-100 dark:bg-mintreu-red-900/30 text-mintreu-red-700 dark:text-mintreu-red-400 rounded-full text-sm font-heading font-bold uppercase tracking-wider">
-            Latest Updates
-          </span>
-        </div>
-        <h1 class="text-4xl sm:text-5xl md:text-6xl font-heading font-black mb-6 text-titanium-900 dark:text-white">
-          <span class="text-mintreu-red-600">Insights</span> & Tutorials
-        </h1>
-        <p class="text-lg text-titanium-600 dark:text-titanium-400 max-w-2xl mx-auto font-subheading">
-          Tutorials, guides, and resources to help you build better applications
-        </p>
-        <div class="line-technical mt-8 mx-auto max-w-md"></div>
-      </div>
-
+    <div ref="sectionRef" class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-1 pt-8">
       <!-- Search & Filters -->
       <div class="mb-12">
         <div class="flex flex-col lg:flex-row gap-4 items-center justify-between mb-6">
@@ -271,26 +256,31 @@ const initAnimations = () => {
   ctx?.revert()
   if (!sectionRef.value) return
   ctx = gsap.context(() => {
-    gsap.from('.insights-header', {
-      y: 40, opacity: 0, duration: 0.8, ease: 'power3.out',
-      scrollTrigger: { trigger: '.insights-header', start: 'top 85%' },
-    })
-
     const cards = gsap.utils.toArray('.article-card') as HTMLElement[]
-    cards.forEach((card, i) => {
-      gsap.from(card, {
-        y: 50, opacity: 0, scale: 0.95,
-        duration: 0.7, delay: i * 0.06,
-        ease: 'back.out(1.3)',
-        scrollTrigger: { trigger: card, start: 'top 90%' },
+    if (cards.length) {
+      gsap.set(cards, { opacity: 0, y: 50, scale: 0.95 })
+      ScrollTrigger.create({
+        trigger: cards[0],
+        start: 'top 92%',
+        once: true,
+        onEnter: () => {
+          gsap.to(cards, { opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.06, ease: 'back.out(1.3)' })
+        }
       })
-    })
+    }
 
-    gsap.from('.newsletter-cta', {
-      y: 60, opacity: 0, scale: 0.95, duration: 1, ease: 'power3.out',
-      scrollTrigger: { trigger: '.newsletter-cta', start: 'top 85%' },
-    })
+    const newsletter = sectionRef.value?.querySelector('.newsletter-cta')
+    if (newsletter) {
+      gsap.set(newsletter, { opacity: 0, y: 60, scale: 0.95 })
+      ScrollTrigger.create({
+        trigger: newsletter,
+        start: 'top 90%',
+        once: true,
+        onEnter: () => { gsap.to(newsletter, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: 'power3.out' }) }
+      })
+    }
   }, sectionRef.value)
+  ScrollTrigger.refresh()
 }
 
 onMounted(() => {

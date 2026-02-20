@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   ssr: false,
 
   modules: [
@@ -20,10 +20,10 @@ export default defineNuxtConfig({
   laravelSanctum: {
     apiUrl: process.env.NUXT_PUBLIC_API_BASE || 'https://account.mintreu.com',
     authMode: 'token',
-    userResponseWrapperKey: 'data',
+    userResponseWrapperKey: null,
     token: {
       storageKey: 'mintreu_auth_token',
-      provider: 'cookie',
+      provider: 'localStorage',
       responseKey: 'token'
     },
     sanctumEndpoints: {
@@ -34,8 +34,8 @@ export default defineNuxtConfig({
     redirect: {
       enableIntendedRedirect: true,
       loginPath: '/auth/signin',
-      guestOnlyRedirect: '/',
-      redirectToAfterLogin: '/',
+      guestOnlyRedirect: '/dashboard',
+      redirectToAfterLogin: '/dashboard',
       redirectToAfterLogout: '/'
     },
     globalMiddleware: {
